@@ -245,7 +245,10 @@ class RefreshEvents extends Command
                     $fight->division_id = $division->id;
                 }
                 $fight->method = $eachFight['method'];
-                $fight->referee_id = $referee->id;
+                if($referee != null)
+                {
+                    $fight->referee_id = $referee->id;
+                }
                 $fight->round = $eachFight['round'];
                 $fight->time = $eachFight['time'];
                 $fight->state = $eachFight['state'];
