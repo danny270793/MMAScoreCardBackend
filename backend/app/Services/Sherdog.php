@@ -285,11 +285,13 @@ class Sherdog
         $tableNumber = -1;
         foreach ($tables as $table)
         {
-            if($table->getAttribute('class') == "new_table result")
+            $tableClass = $table->getAttribute('class');
+            if($tableClass == "new_table result" || $tableClass == "new_table upcoming")
             {
                 $hasFights = true;
             }
         }
+
         if(!$hasFights)
         {
             return;
