@@ -23,14 +23,20 @@ class Sherdog
         $this->cache = $cache;
     }
 
-    public function getHtml($url)
+    public function getHtml($url, $forceRefresh = false)
     {
+        if($forceRefresh)
+        {
+            $this->cache->remove($url);
+        }
+
         $has = $this->cache->has($url);
         if($has)
         {
             return $this->cache->get($url);
         }
 
+        Log::info("GET $url");
         $response = Http::get($url);
         $responseStatus = $response->status();
         if($responseStatus != 200)
@@ -43,12 +49,12 @@ class Sherdog
         return $html;
     }
 
-    public function executeOnEachEventFromPage($page, $callback)
+    public function executeOnEachEventFromPage($page, $callback, $forceRefresh)
     {
         $eventsCounter = 0;
 
         $url = "$this->baseUrl/organizations/Ultimate-Fighting-Championship-UFC-2/recent-events/$page";
-        $html = $this->getHtml($url);
+        $html = $this->getHtml($url, $forceRefresh);
         
         $dom = new \DOMDocument();
         libxml_use_internal_errors(true);
@@ -63,7 +69,7 @@ class Sherdog
             }
 
             $tableNumber += 1;
-            if($page > 0 && $tableNumber == 0)
+            if($page > 1 && $tableNumber == 0)
             {
                 continue;
             }
@@ -108,7 +114,8 @@ class Sherdog
                     'location' => $location,
                     'country' => $country,
                     'date' => $date,
-                    'link' => "$this->baseUrl$link"
+                    'link' => "$this->baseUrl$link",
+                    'state' => $tableNumber == 0 ? 'upcoming' : 'finished'
                 ];
                 $callback($event);
                 $eventsCounter += 1;
@@ -214,13 +221,14 @@ class Sherdog
     //     return $events;   
     // }
 
-    public function executeOnEachEvent($callback)
+    public function executeOnEachEvent($forceRefresh, $callback)
     {
         $pageHasEvents = true;
         $page = 1;
         while($pageHasEvents)
         {
-            $pageEvents = $this->executeOnEachEventFromPage($page, $callback);
+            $refreshPage = $forceRefresh && $page == 1;
+            $pageEvents = $this->executeOnEachEventFromPage($page, $callback, $refreshPage);
             if($pageEvents == 0)
             {
                 $pageHasEvents = false;
@@ -231,6 +239,8 @@ class Sherdog
 
     public function getFighterDetails($dom, $column)
     {
+        $fighterResult = null;
+        
         $links = $column->getElementsByTagName('a');
         foreach($links as $link)
         {
@@ -253,7 +263,7 @@ class Sherdog
             return [
                 'fighterName' => $link->textContent,
                 'fighterLink' => $this->baseUrl . $link->getAttribute('href'),
-                'fighterResult' => strtolower($fighterResult)
+                'fighterResult' => $fighterResult == null ? 'yet to come' : strtolower($fighterResult)
             ];
         }
 
@@ -262,19 +272,35 @@ class Sherdog
 
     public function executeOnEachFightsDataFromEvent($event, $callback)
     {
+        Log::info("event=" . $event['link']);
+
         $html = $this->getHtml($event['link']);
         $dom = new \DOMDocument();
         libxml_use_internal_errors(true);
         $dom->loadHTML($html);
 
-        $hasMainEvent = false;
+        // check if event has fights
+        $hasFights = false;
+        $tables = $dom->getElementsByTagName('table');
+        $tableNumber = -1;
+        foreach ($tables as $table)
+        {
+            if($table->getAttribute('class') == "new_table result")
+            {
+                $hasFights = true;
+            }
+        }
+        if(!$hasFights)
+        {
+            return;
+        }
 
+        // if has fights get them
         $divs = $dom->getElementsByTagName('div');
         foreach ($divs as $div)
         {
             if($div->getAttribute('class') == "fighter left_side")
             {
-                $hasMainEvent = true;
                 $h3s = $div->getElementsByTagName('h3');
                 foreach ($h3s as $h3)
                 {
@@ -330,17 +356,21 @@ class Sherdog
             }
         }
 
+        $position = 100;
+        $method = null;
+        $refereeName = null;
+        $round = null;
+        $time = null;
+        $state = 'upcoming';
+
         $tables = $dom->getElementsByTagName('table');
         foreach ($tables as $table)
         {
             if($table->getAttribute('class') == "fight_card_resume")
             {
                 $rows = $table->getElementsByTagName('tr');
-                $rowsCount = count($rows);
-                $rowNumber = -1;
                 foreach ($rows as $row)
                 {
-                    $rowNumber += 1;
                     $columns = $row->getElementsByTagName('td');
 
                     $position = trim($columns->item(0)->textContent);
@@ -350,13 +380,9 @@ class Sherdog
                     $refereeName = trim(str_replace("Referee", "", $columns->item(2)->textContent));
                     $round = trim(str_replace("Round", "", $columns->item(3)->textContent));
                     $time = trim(str_replace("Time", "", $columns->item(4)->textContent));
+                    $state = 'finished';
                 }
             }
-        }
-
-        if(!$hasMainEvent)
-        {
-            return;
         }
 
         $divisionName = trim(str_replace("\n", '', $divisionName));
@@ -383,7 +409,8 @@ class Sherdog
             'method' => $method,
             'referee' => $refereeName,
             'round' => $round,
-            'time' => $time
+            'time' => $time,
+            'state' => $state
         ];
         $callback($fight);
 
@@ -427,6 +454,7 @@ class Sherdog
                     $refereeName = null;
                     $round = null;
                     $time = null;
+                    $state = 'upcoming';
                 }
                 else if($columns->length == 7)
                 {
@@ -451,6 +479,7 @@ class Sherdog
 
                     $round = trim($columns->item(5)->textContent);
                     $time = trim($columns->item(6)->textContent);
+                    $state = 'finished';
                 }
                 else
                 {
@@ -481,7 +510,8 @@ class Sherdog
                     'method' => $method,
                     'referee' => $refereeName,
                     'round' => $round,
-                    'time' => $time
+                    'time' => $time,
+                    'state' => $state
                 ];
                 $callback($fight);
             }
@@ -683,6 +713,11 @@ class Sherdog
     public function executeOnEachRefereeFromEvent($event, $callback)
     {
         $this->executeOnEachFightsDataFromEvent($event, function ($fight) use ($callback) {
+            if($fight['referee'] == null)
+            {
+                return;
+            }
+
             $referee = [
                 'name' => $fight['referee'],
             ];
@@ -1031,6 +1066,7 @@ class Sherdog
                 'referee' => $fight['referee'],
                 'round' => $fight['round'],
                 'time' => $fight['time'],
+                'state' => $fight['state'],
             ];
 
             $callback($fight);
