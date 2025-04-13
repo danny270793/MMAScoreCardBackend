@@ -12,11 +12,11 @@ use App\Models\Fight;
 
 class RefreshEvents extends Command
 {
-    protected $signature = 'sherdog:refresh';
+    protected $signature = 'sherdog:refresh {--force=false}';
 
     protected $description = 'Refresh the events from Sherdog';
 
-    public function createEvents(Sherdog $sherdog)
+    public function createEvents(Sherdog $sherdog, $force)
     {
         // $events = $sherdog->getEvents();
         // $eventsCount = count($events);
@@ -39,7 +39,7 @@ class RefreshEvents extends Command
         // }
 
         $this->info("Getting events");
-        $sherdog->executeOnEachEvent(function($eachEvent) {
+        $sherdog->executeOnEachEvent($force, function($eachEvent) {
             $event = Event::where('name', $eachEvent['name'])->first();
             if($event == null)
             {
@@ -52,6 +52,7 @@ class RefreshEvents extends Command
             $event->country = $eachEvent['country'];
             $event->date = $eachEvent['date'];
             $event->link = $eachEvent['link'];
+            $event->state = $eachEvent['state'];
             $event->save();
         });
         $this->withProgressBar(Event::all(), function ($event) {});
@@ -247,6 +248,7 @@ class RefreshEvents extends Command
                 $fight->referee_id = $referee->id;
                 $fight->round = $eachFight['round'];
                 $fight->time = $eachFight['time'];
+                $fight->state = $eachFight['state'];
                 $fight->save();
             });
         });
@@ -256,7 +258,9 @@ class RefreshEvents extends Command
 
     public function handle(Sherdog $sherdog)
     {
-        $this->createEvents($sherdog);
+        $force = $this->option('force');
+
+        $this->createEvents($sherdog, $force == 'true');
         $this->createReferees($sherdog);
         $this->createDivisions($sherdog);
         $this->createFighters($sherdog);
