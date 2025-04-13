@@ -31,4 +31,15 @@ class DatabaseCache extends Cacheable
         $cache->value = $value;
         $cache->save();
     }
+    
+    public function remove($key)
+    {
+        $cache = Cache::where('key', $key)->first();
+        if($cache == null)
+        {
+            return;
+        }
+
+        $cache->delete();
+    }
 }

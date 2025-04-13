@@ -12,4 +12,6 @@ abstract class Cache
     public abstract function has($key);
 
     public abstract function put($key, $value);
+    
+    public abstract function remove($key);
 }
