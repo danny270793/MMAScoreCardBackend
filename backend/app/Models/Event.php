@@ -13,7 +13,8 @@ class Event extends Model
         'location',
         'country',
         'date',
-        'link'
+        'link',
+        'state'
     ];
 
     protected $hidden = [

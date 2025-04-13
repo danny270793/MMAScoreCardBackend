@@ -20,6 +20,7 @@ class Fight extends Model
         'referee_id',
         'round',
         'time',
+        'state'
     ];
 
     public function event(): BelongsTo
