@@ -2,14 +2,14 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
-use App\Services\Sherdog;
-use App\Services\Cache;
-use App\Models\Event;
-use App\Models\Referee;
 use App\Models\Division;
-use App\Models\Fighter;
+use App\Models\Event;
 use App\Models\Fight;
+use App\Models\Fighter;
+use App\Models\Referee;
+use App\Services\Cache;
+use App\Services\Sherdog;
+use Illuminate\Console\Command;
 
 class RefreshEvents extends Command
 {
@@ -39,16 +39,13 @@ class RefreshEvents extends Command
         //     $event->save();
         // }
 
-        $this->info("Getting events");
-        $sherdog->executeOnEachEvent($force, function($eachEvent) use ($cache) {
+        $this->info('Getting events');
+        $sherdog->executeOnEachEvent($force, function ($eachEvent) use ($cache) {
             $event = Event::where('name', $eachEvent['name'])->first();
-            if($event == null)
-            {
-                $event = new Event();
-            }
-            else {
-                if($event->state != $eachEvent['state'])
-                {
+            if ($event == null) {
+                $event = new Event;
+            } else {
+                if ($event->state != $eachEvent['state']) {
                     Fight::where('event_id', $event->id)->delete();
                     $cache->remove($event['link']);
                 }
@@ -65,7 +62,7 @@ class RefreshEvents extends Command
         });
         $this->withProgressBar(Event::all(), function ($event) {});
         $this->newLine();
-        $this->comment(Event::count() . " events on database");
+        $this->comment(Event::count().' events on database');
     }
 
     public function createReferees(Sherdog $sherdog)
@@ -85,21 +82,20 @@ class RefreshEvents extends Command
         //     $referee->save();
         // }
 
-        $this->info("Getting referees");
+        $this->info('Getting referees');
         $this->withProgressBar(Event::all(), function ($event) use ($sherdog) {
-            $sherdog->executeOnEachRefereeFromEvent($event, function($eachReferee) {
+            $sherdog->executeOnEachRefereeFromEvent($event, function ($eachReferee) {
                 $referee = Referee::where('name', $eachReferee['name'])->first();
-                if($referee == null)
-                {
-                    $referee = new Referee();
+                if ($referee == null) {
+                    $referee = new Referee;
                 }
-    
+
                 $referee->name = $eachReferee['name'];
                 $referee->save();
             });
         });
         $this->newLine();
-        $this->comment(Referee::count() . " referees on database");
+        $this->comment(Referee::count().' referees on database');
     }
 
     public function createDivisions(Sherdog $sherdog)
@@ -119,13 +115,12 @@ class RefreshEvents extends Command
         //     $division->save();
         // }
 
-        $this->info("Getting divisions");
+        $this->info('Getting divisions');
         $this->withProgressBar(Event::all(), function ($event, $bar) use ($sherdog) {
-            $sherdog->executeOnEachDivisionsFromEvent($event, function($eachDivision) {
+            $sherdog->executeOnEachDivisionsFromEvent($event, function ($eachDivision) {
                 $division = Division::where('name', $eachDivision['name'])->first();
-                if($division == null)
-                {
-                    $division = new Division();
+                if ($division == null) {
+                    $division = new Division;
                 }
                 $division->name = $eachDivision['name'];
                 $division->weight = $eachDivision['weight'];
@@ -134,7 +129,7 @@ class RefreshEvents extends Command
             });
         });
         $this->newLine();
-        $this->comment(Division::count() . " divisions on database");
+        $this->comment(Division::count().' divisions on database');
     }
 
     public function createFighters(Sherdog $sherdog)
@@ -161,13 +156,12 @@ class RefreshEvents extends Command
         //     $fighter->save();
         // }
 
-        $this->info("Getting fighters");
+        $this->info('Getting fighters');
         $this->withProgressBar(Event::all(), function ($event) use ($sherdog) {
-            $sherdog->executeOnEachFightersFromEvent($event, function($eachFighter) {
+            $sherdog->executeOnEachFightersFromEvent($event, function ($eachFighter) {
                 $fighter = Fighter::where('name', $eachFighter['name'])->first();
-                if($fighter == null)
-                {
-                    $fighter = new Fighter();
+                if ($fighter == null) {
+                    $fighter = new Fighter;
                 }
                 $fighter->name = $eachFighter['name'];
                 $fighter->link = $eachFighter['link'];
@@ -182,7 +176,7 @@ class RefreshEvents extends Command
             });
         });
         $this->newLine();
-        $this->comment(Fighter::count() . " fighters on database");
+        $this->comment(Fighter::count().' fighters on database');
     }
 
     public function createFights(Sherdog $sherdog)
@@ -224,9 +218,9 @@ class RefreshEvents extends Command
         //     $fight->save();
         // }
 
-        $this->info("Getting fights");
+        $this->info('Getting fights');
         $this->withProgressBar(Event::all(), function ($event) use ($sherdog) {
-            $sherdog->executeOnEachFightsFromEvent($event, function($eachFight) {
+            $sherdog->executeOnEachFightsFromEvent($event, function ($eachFight) {
                 $event = Event::where('name', $eachFight['event'])->first();
                 $fighter1 = Fighter::where('name', $eachFight['fighter1'])->first();
                 $fighter2 = Fighter::where('name', $eachFight['fighter2'])->first();
@@ -237,24 +231,21 @@ class RefreshEvents extends Command
                     ->where('fighter1_id', $fighter1->id)
                     ->where('fighter2_id', $fighter2->id)
                     ->first();
-                if($fight == null)
-                {
-                    $fight = new Fight();
+                if ($fight == null) {
+                    $fight = new Fight;
                 }
-    
+
                 $fight->position = $eachFight['position'];
                 $fight->event_id = $event->id;
                 $fight->fighter1_id = $fighter1->id;
                 $fight->fighter1_result = $eachFight['fighter1_result'];
                 $fight->fighter2_id = $fighter2->id;
                 $fight->fighter2_result = $eachFight['fighter2_result'];
-                if($division != null)
-                {
+                if ($division != null) {
                     $fight->division_id = $division->id;
                 }
                 $fight->method = $eachFight['method'];
-                if($referee != null)
-                {
+                if ($referee != null) {
                     $fight->referee_id = $referee->id;
                 }
                 $fight->round = $eachFight['round'];
@@ -264,7 +255,7 @@ class RefreshEvents extends Command
             });
         });
         $this->newLine();
-        $this->comment(Fight::count() . " fights on database");
+        $this->comment(Fight::count().' fights on database');
     }
 
     public function handle(Sherdog $sherdog, Cache $cache)

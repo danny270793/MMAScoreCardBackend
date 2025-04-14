@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 class FileCache
 {
     private $path = 'app/cache.json';
+
     private $data = [];
 
     public function __construct()
@@ -15,8 +16,7 @@ class FileCache
         ini_set('memory_limit', '2560M');
 
         $filePath = storage_path($this->path);
-        if (!File::exists($filePath))
-        {
+        if (! File::exists($filePath)) {
             return;
         }
         $jsonData = File::get($filePath);
@@ -36,6 +36,7 @@ class FileCache
     public function has($key)
     {
         $value = $this->get($key);
+
         return $value !== null;
     }
 
@@ -43,8 +44,7 @@ class FileCache
     {
         $filePath = storage_path($this->path);
         Log::info("saving $key in $filePath");
-        if (!File::exists($filePath))
-        {
+        if (! File::exists($filePath)) {
             File::put($filePath, json_encode([]));
         }
 

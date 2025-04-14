@@ -1,11 +1,10 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EventsController;
-use App\Http\Controllers\FightsController;
-use App\Http\Controllers\FightersController;
 use App\Http\Controllers\DivisionsController;
+use App\Http\Controllers\EventsController;
+use App\Http\Controllers\FightersController;
+use App\Http\Controllers\FightsController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/events', [EventsController::class, 'index']);
 Route::get('/events/{id}', [EventsController::class, 'get']);
@@ -24,4 +23,4 @@ Route::get('/divisions', [DivisionsController::class, 'index']);
 Route::get('/divisions/{id}', [DivisionsController::class, 'get']);
 Route::get('/divisions/{id}/fights', [DivisionsController::class, 'fightsByDivision']);
 Route::get('/divisions/{id}/fighters', [DivisionsController::class, 'fightersByDivision']);
-//->middleware('auth:sanctum')
+// ->middleware('auth:sanctum')

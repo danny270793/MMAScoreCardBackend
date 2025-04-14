@@ -2,25 +2,29 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Fighter;
 use App\Models\Fight;
+use App\Models\Fighter;
+use Illuminate\Http\Request;
 
 class FightersController extends Controller
 {
-    function index()
+    public function index()
     {
         $fighters = Fighter::paginate(10);
+
         return response()
             ->json($fighters);
     }
-    function get($id)
+
+    public function get($id)
     {
         $fighter = Fighter::find($id);
+
         return response()
             ->json($fighter);
     }
-    function fightsByFighter($id)
+
+    public function fightsByFighter($id)
     {
         $fights = Fight::where('fighter1_id', $id)
             ->orWhere('fighter2_id', $id)
@@ -28,10 +32,12 @@ class FightersController extends Controller
             ->join('events', 'fights.event_id', '=', 'events.id')
             ->orderBy('events.date', 'desc')
             ->paginate(10);
+
         return response()
             ->json($fights);
     }
-    function search(Request $request)
+
+    public function search(Request $request)
     {
         $query = $request->input('query');
         $fighters = Fighter::where('name', 'LIKE', "%$query%")
@@ -40,6 +46,7 @@ class FightersController extends Controller
             ->orWhere('city', 'LIKE', "%$query%")
             ->orWhere('weight', 'LIKE', "%$query%")
             ->paginate(10);
+
         return response()
             ->json($fighters);
 

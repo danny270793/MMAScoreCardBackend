@@ -4,32 +4,37 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use App\Models\Fight;
-use App\Models\Fighter;
 use App\Utils\Paginator;
 
 class EventsController extends Controller
 {
-    function index()
+    public function index()
     {
         $events = Event::orderBy('date', 'desc')->paginate(10);
+
         return response()
             ->json($events);
     }
-    function get($id)
+
+    public function get($id)
     {
         $event = Event::find($id);
+
         return response()
             ->json($event);
     }
-    function fightsByEvent($id)
+
+    public function fightsByEvent($id)
     {
         $fights = Fight::orderBy('position', 'desc')->where('event_id', $id)
             ->with('fighter1', 'fighter2', 'division', 'referee')
             ->paginate(10);
+
         return response()
             ->json($fights);
     }
-    function fightersByEvent($id)
+
+    public function fightersByEvent($id)
     {
         $fights = Fight::where('event_id', $id)
             ->with('fighter1', 'fighter2', 'division', 'referee')
@@ -45,7 +50,7 @@ class EventsController extends Controller
                     break;
                 }
             }
-            if(!$alreadyExists) {
+            if (! $alreadyExists) {
                 $fighters[] = $fight->fighter1;
                 $fighters[] = $fight->fighter2;
             }
@@ -56,6 +61,4 @@ class EventsController extends Controller
         return response()
             ->json($paginator);
     }
-
-    
 }
