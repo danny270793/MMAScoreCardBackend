@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Services\Sherdog;
+use App\Services\Cache;
 use App\Models\Event;
 use App\Models\Referee;
 use App\Models\Division;
@@ -16,7 +17,7 @@ class RefreshEvents extends Command
 
     protected $description = 'Refresh the events from Sherdog';
 
-    public function createEvents(Sherdog $sherdog, $force)
+    public function createEvents(Sherdog $sherdog, Cache $cache, $force)
     {
         // $events = $sherdog->getEvents();
         // $eventsCount = count($events);
@@ -39,11 +40,18 @@ class RefreshEvents extends Command
         // }
 
         $this->info("Getting events");
-        $sherdog->executeOnEachEvent($force, function($eachEvent) {
+        $sherdog->executeOnEachEvent($force, function($eachEvent) use ($cache) {
             $event = Event::where('name', $eachEvent['name'])->first();
             if($event == null)
             {
                 $event = new Event();
+            }
+            else {
+                if($event->state != $eachEvent['state'])
+                {
+                    Fight::where('event_id', $event->id)->delete();
+                    $cache->remove($event['link']);
+                }
             }
 
             $event->name = $eachEvent['name'];
@@ -224,7 +232,7 @@ class RefreshEvents extends Command
                 $fighter2 = Fighter::where('name', $eachFight['fighter2'])->first();
                 $referee = Referee::where('name', $eachFight['referee'])->first();
                 $division = Division::where('name', $eachFight['division'])->first();
-    
+
                 $fight = Fight::where('event_id', $event->id)
                     ->where('fighter1_id', $fighter1->id)
                     ->where('fighter2_id', $fighter2->id)
@@ -259,11 +267,11 @@ class RefreshEvents extends Command
         $this->comment(Fight::count() . " fights on database");
     }
 
-    public function handle(Sherdog $sherdog)
+    public function handle(Sherdog $sherdog, Cache $cache)
     {
         $force = $this->option('force');
 
-        $this->createEvents($sherdog, $force == 'true');
+        $this->createEvents($sherdog, $cache, $force == 'true');
         $this->createReferees($sherdog);
         $this->createDivisions($sherdog);
         $this->createFighters($sherdog);
