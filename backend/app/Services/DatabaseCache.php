@@ -24,7 +24,7 @@ class DatabaseCache extends Cacheable
     public function put($key, $value)
     {
         $cache = Cache::where('key', $key)->first();
-        if ($cache == null) {
+        if ($cache === null) {
             $cache = new Cache;
         }
         $cache->key = $key;
@@ -35,7 +35,7 @@ class DatabaseCache extends Cacheable
     public function remove($key)
     {
         $cache = Cache::where('key', $key)->first();
-        if ($cache == null) {
+        if ($cache === null) {
             return;
         }
 

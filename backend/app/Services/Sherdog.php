@@ -35,7 +35,7 @@ class Sherdog
         Log::info("GET $url");
         $response = Http::get($url);
         $responseStatus = $response->status();
-        if ($responseStatus != 200) {
+        if ($responseStatus !== 200) {
             throw new \Exception("GET $url returns non 200 status => $responseStatus");
         }
 
@@ -58,12 +58,12 @@ class Sherdog
         $tables = $dom->getElementsByTagName('table');
         $tableNumber = -1;
         foreach ($tables as $table) {
-            if (! $table->getAttribute('class') == 'new_table event') {
+            if (! $table->getAttribute('class') === 'new_table event') {
                 continue;
             }
 
             $tableNumber += 1;
-            if ($page > 1 && $tableNumber == 0) {
+            if ($page > 1 && $tableNumber === 0) {
                 continue;
             }
 
@@ -71,7 +71,7 @@ class Sherdog
             $rowNumber = -1;
             foreach ($rows as $row) {
                 $rowNumber += 1;
-                if ($rowNumber == 0) {
+                if ($rowNumber === 0) {
                     continue;
                 }
                 $columns = $row->getElementsByTagName('td');
@@ -103,7 +103,7 @@ class Sherdog
                     'country' => $country,
                     'date' => $date,
                     'link' => "$this->baseUrl$link",
-                    'state' => $tableNumber == 0 ? 'upcoming' : 'finished',
+                    'state' => $tableNumber === 0 ? 'upcoming' : 'finished',
                 ];
                 $callback($event);
                 $eventsCounter += 1;
@@ -214,9 +214,9 @@ class Sherdog
         $pageHasEvents = true;
         $page = 1;
         while ($pageHasEvents) {
-            $refreshPage = $forceRefresh && $page == 1;
+            $refreshPage = $forceRefresh && $page === 1;
             $pageEvents = $this->executeOnEachEventFromPage($page, $callback, $refreshPage);
-            if ($pageEvents == 0) {
+            if ($pageEvents === 0) {
                 $pageHasEvents = false;
             }
             $page += 1;
@@ -245,7 +245,7 @@ class Sherdog
             return [
                 'fighterName' => $link->textContent,
                 'fighterLink' => $this->baseUrl.$link->getAttribute('href'),
-                'fighterResult' => $fighterResult == null ? 'yet to come' : strtolower($fighterResult),
+                'fighterResult' => $fighterResult === null ? 'yet to come' : strtolower($fighterResult),
             ];
         }
 
@@ -267,7 +267,7 @@ class Sherdog
         $tableNumber = -1;
         foreach ($tables as $table) {
             $tableClass = $table->getAttribute('class');
-            if ($tableClass == 'new_table result' || $tableClass == 'new_table upcoming') {
+            if ($tableClass === 'new_table result' || $tableClass === 'new_table upcoming') {
                 $hasFights = true;
             }
         }
@@ -279,7 +279,7 @@ class Sherdog
         // if has fights get them
         $divs = $dom->getElementsByTagName('div');
         foreach ($divs as $div) {
-            if ($div->getAttribute('class') == 'fighter left_side') {
+            if ($div->getAttribute('class') === 'fighter left_side') {
                 $h3s = $div->getElementsByTagName('h3');
                 foreach ($h3s as $h3) {
                     $fighter1Name = trim($h3->textContent);
@@ -296,7 +296,7 @@ class Sherdog
                         $fighter1Result = strtolower(trim($span->textContent));
                     }
                 }
-            } elseif ($div->getAttribute('class') == 'fighter right_side') {
+            } elseif ($div->getAttribute('class') === 'fighter right_side') {
                 $h3s = $div->getElementsByTagName('h3');
                 foreach ($h3s as $h3) {
                     $fighter2Name = trim($h3->textContent);
@@ -318,7 +318,7 @@ class Sherdog
 
         $spans = $dom->getElementsByTagName('span');
         foreach ($spans as $span) {
-            if ($span->getAttribute('class') == 'weight_class') {
+            if ($span->getAttribute('class') === 'weight_class') {
                 $divisionName = trim($span->textContent);
             }
         }
@@ -332,7 +332,7 @@ class Sherdog
 
         $tables = $dom->getElementsByTagName('table');
         foreach ($tables as $table) {
-            if ($table->getAttribute('class') == 'fight_card_resume') {
+            if ($table->getAttribute('class') === 'fight_card_resume') {
                 $rows = $table->getElementsByTagName('tr');
                 foreach ($rows as $row) {
                     $columns = $row->getElementsByTagName('td');
@@ -378,7 +378,7 @@ class Sherdog
         $tables = $dom->getElementsByTagName('table');
         $tableNumber = -1;
         foreach ($tables as $table) {
-            if (! $table->getAttribute('class') == 'new_table result') {
+            if (! $table->getAttribute('class') === 'new_table result') {
                 continue;
             }
 
@@ -387,11 +387,11 @@ class Sherdog
             $rowNumber = -1;
             foreach ($rows as $row) {
                 $rowNumber += 1;
-                if ($rowNumber == 0) {
+                if ($rowNumber === 0) {
                     continue;
                 }
                 $columns = $row->getElementsByTagName('td');
-                if ($columns->length == 5) {
+                if ($columns->length === 5) {
                     $position = trim($columns->item(0)->textContent);
 
                     $fighter1Details = $this->getFighterDetails($dom, $columns->item(1));
@@ -411,7 +411,7 @@ class Sherdog
                     $round = null;
                     $time = null;
                     $state = 'upcoming';
-                } elseif ($columns->length == 7) {
+                } elseif ($columns->length === 7) {
                     $position = trim($columns->item(0)->textContent);
 
                     $fighter1Details = $this->getFighterDetails($dom, $columns->item(1));
@@ -660,7 +660,7 @@ class Sherdog
     public function executeOnEachRefereeFromEvent($event, $callback)
     {
         $this->executeOnEachFightsDataFromEvent($event, function ($fight) use ($callback) {
-            if ($fight['referee'] == null) {
+            if ($fight['referee'] === null) {
                 return;
             }
 
@@ -712,7 +712,7 @@ class Sherdog
     public function executeOnEachDivisionsFromEvent($event, $callback)
     {
         $this->executeOnEachFightsDataFromEvent($event, function ($data) use ($callback) {
-            if ($data['division'] == '') {
+            if ($data['division'] === '') {
                 return;
             }
 
@@ -816,7 +816,7 @@ class Sherdog
         $spans = $dom->getElementsByTagName('span');
         foreach ($spans as $span) {
             $className = $span->getAttribute('class');
-            if ($className == 'item birthplace') {
+            if ($className === 'item birthplace') {
                 $strongs = $span->getElementsByTagName('strong');
                 foreach ($strongs as $strong) {
                     $nationality = trim($strong->textContent);
@@ -828,7 +828,7 @@ class Sherdog
                 }
             }
 
-            if ($className == 'nickname') {
+            if ($className === 'nickname') {
                 $nickname = trim($span->textContent);
                 $nickname = substr($nickname, 1, -1);
             }
@@ -836,7 +836,7 @@ class Sherdog
 
         $divs = $dom->getElementsByTagName('div');
         foreach ($divs as $div) {
-            if ($div->getAttribute('class') == 'fighter-data') {
+            if ($div->getAttribute('class') === 'fighter-data') {
                 $tables = $div->getElementsByTagName('table');
                 foreach ($tables as $table) {
                     $rows = $table->getElementsByTagName('tr');
@@ -845,25 +845,25 @@ class Sherdog
                         $rowNumber += 1;
                         $columns = $row->getElementsByTagName('td');
                         $rowName = trim($columns->item(0)->textContent);
-                        if ($rowName == 'AGE') {
+                        if ($rowName === 'AGE') {
                             $birthday = $columns->item(1)->textContent;
                             $birthday = trim(explode('/', $birthday)[1]);
-                            if ($birthday == 'N/A') {
+                            if ($birthday === 'N/A') {
                                 $birthday = null;
                             } else {
                                 $birthday = Carbon::parse($birthday);
                             }
                         }
-                        if ($rowName == 'DIED') {
+                        if ($rowName === 'DIED') {
                             $died = $columns->item(1)->textContent;
                             $died = Carbon::parse($died);
                         }
-                        if ($rowName == 'HEIGHT') {
+                        if ($rowName === 'HEIGHT') {
                             $height = $columns->item(1)->textContent;
                             $height = trim(explode('/', $height)[1]);
                             $height = trim(explode(' ', $height)[0]);
                         }
-                        if ($rowName == 'WEIGHT') {
+                        if ($rowName === 'WEIGHT') {
                             $weight = $columns->item(1)->textContent;
                             $weight = trim(explode('/', $weight)[0]);
                             $weight = trim(explode(' ', $weight)[0]);

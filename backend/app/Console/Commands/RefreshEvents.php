@@ -21,7 +21,7 @@ class RefreshEvents extends Command
     {
         $force = $this->option('force');
 
-        $this->createEvents($sherdog, $cache, $force == 'true');
+        $this->createEvents($sherdog, $cache, $force === 'true');
         $this->createReferees($sherdog);
         $this->createDivisions($sherdog);
         $this->createFighters($sherdog);
@@ -53,10 +53,10 @@ class RefreshEvents extends Command
         $this->info('Getting events');
         $sherdog->executeOnEachEvent($force, function ($eachEvent) use ($cache) {
             $event = Event::where('name', $eachEvent['name'])->first();
-            if ($event == null) {
+            if ($event === null) {
                 $event = new Event;
             } else {
-                if ($event->state != $eachEvent['state']) {
+                if ($event->state !== $eachEvent['state']) {
                     Fight::where('event_id', $event->id)->delete();
                     $cache->remove($event['link']);
                 }
@@ -97,7 +97,7 @@ class RefreshEvents extends Command
         $this->withProgressBar(Event::all(), function ($event) use ($sherdog) {
             $sherdog->executeOnEachRefereeFromEvent($event, function ($eachReferee) {
                 $referee = Referee::where('name', $eachReferee['name'])->first();
-                if ($referee == null) {
+                if ($referee === null) {
                     $referee = new Referee;
                 }
 
@@ -130,7 +130,7 @@ class RefreshEvents extends Command
         $this->withProgressBar(Event::all(), function ($event, $bar) use ($sherdog) {
             $sherdog->executeOnEachDivisionsFromEvent($event, function ($eachDivision) {
                 $division = Division::where('name', $eachDivision['name'])->first();
-                if ($division == null) {
+                if ($division === null) {
                     $division = new Division;
                 }
                 $division->name = $eachDivision['name'];
@@ -171,7 +171,7 @@ class RefreshEvents extends Command
         $this->withProgressBar(Event::all(), function ($event) use ($sherdog) {
             $sherdog->executeOnEachFightersFromEvent($event, function ($eachFighter) {
                 $fighter = Fighter::where('name', $eachFighter['name'])->first();
-                if ($fighter == null) {
+                if ($fighter === null) {
                     $fighter = new Fighter;
                 }
                 $fighter->name = $eachFighter['name'];
@@ -242,7 +242,7 @@ class RefreshEvents extends Command
                     ->where('fighter1_id', $fighter1->id)
                     ->where('fighter2_id', $fighter2->id)
                     ->first();
-                if ($fight == null) {
+                if ($fight === null) {
                     $fight = new Fight;
                 }
 
@@ -252,11 +252,11 @@ class RefreshEvents extends Command
                 $fight->fighter1_result = $eachFight['fighter1_result'];
                 $fight->fighter2_id = $fighter2->id;
                 $fight->fighter2_result = $eachFight['fighter2_result'];
-                if ($division != null) {
+                if ($division !== null) {
                     $fight->division_id = $division->id;
                 }
                 $fight->method = $eachFight['method'];
-                if ($referee != null) {
+                if ($referee !== null) {
                     $fight->referee_id = $referee->id;
                 }
                 $fight->round = $eachFight['round'];

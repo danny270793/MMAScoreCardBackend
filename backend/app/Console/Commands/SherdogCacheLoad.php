@@ -22,7 +22,7 @@ class SherdogCacheLoad extends Command
         foreach ($keys as $key) {
             $value = $fileCache->get($key);
             $cache = Cache::where('key', $key)->first();
-            if ($cache == null) {
+            if ($cache === null) {
                 $cache = new Cache;
                 $cache->key = $key;
             }

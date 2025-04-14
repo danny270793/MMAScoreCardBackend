@@ -45,7 +45,7 @@ class DivisionsController extends Controller
         foreach ($fights as $fight) {
             $alreadyExists = false;
             foreach ($fighters as $fighter) {
-                if ($fighter->id == $fight->fighter1->id || $fighter->id == $fight->fighter2->id) {
+                if ($fighter->id === $fight->fighter1->id || $fighter->id === $fight->fighter2->id) {
                     $alreadyExists = true;
                     break;
                 }
