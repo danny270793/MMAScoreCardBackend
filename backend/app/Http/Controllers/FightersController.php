@@ -25,6 +25,8 @@ class FightersController extends Controller
         $fights = Fight::where('fighter1_id', $id)
             ->orWhere('fighter2_id', $id)
             ->with('fighter1', 'fighter2', 'division', 'referee')
+            ->join('events', 'fights.event_id', '=', 'events.id')
+            ->orderBy('events.date', 'desc')
             ->paginate(10);
         return response()
             ->json($fights);
