@@ -17,7 +17,18 @@ class RefreshEvents extends Command
 
     protected $description = 'Refresh the events from Sherdog';
 
-    public function createEvents(Sherdog $sherdog, Cache $cache, $force)
+    public function handle(Sherdog $sherdog, Cache $cache)
+    {
+        $force = $this->option('force');
+
+        $this->createEvents($sherdog, $cache, $force == 'true');
+        $this->createReferees($sherdog);
+        $this->createDivisions($sherdog);
+        $this->createFighters($sherdog);
+        $this->createFights($sherdog);
+    }
+
+    private function createEvents(Sherdog $sherdog, Cache $cache, $force)
     {
         // $events = $sherdog->getEvents();
         // $eventsCount = count($events);
@@ -65,7 +76,7 @@ class RefreshEvents extends Command
         $this->comment(Event::count().' events on database');
     }
 
-    public function createReferees(Sherdog $sherdog)
+    private function createReferees(Sherdog $sherdog)
     {
         // $referees = $sherdog->getReferees();
         // $refereeCount = count($referees);
@@ -98,7 +109,7 @@ class RefreshEvents extends Command
         $this->comment(Referee::count().' referees on database');
     }
 
-    public function createDivisions(Sherdog $sherdog)
+    private function createDivisions(Sherdog $sherdog)
     {
         // $divisions = $sherdog->getDivisions();
         // $divisionsCount = count($divisions);
@@ -132,7 +143,7 @@ class RefreshEvents extends Command
         $this->comment(Division::count().' divisions on database');
     }
 
-    public function createFighters(Sherdog $sherdog)
+    private function createFighters(Sherdog $sherdog)
     {
         // $fighters = $sherdog->getFighters();
         // $fightersCount = count($fighters);
@@ -179,7 +190,7 @@ class RefreshEvents extends Command
         $this->comment(Fighter::count().' fighters on database');
     }
 
-    public function createFights(Sherdog $sherdog)
+    private function createFights(Sherdog $sherdog)
     {
         // $fights = $sherdog->getFights();
         // $fightsCount = count($fights);
@@ -256,16 +267,5 @@ class RefreshEvents extends Command
         });
         $this->newLine();
         $this->comment(Fight::count().' fights on database');
-    }
-
-    public function handle(Sherdog $sherdog, Cache $cache)
-    {
-        $force = $this->option('force');
-
-        $this->createEvents($sherdog, $cache, $force == 'true');
-        $this->createReferees($sherdog);
-        $this->createDivisions($sherdog);
-        $this->createFighters($sherdog);
-        $this->createFights($sherdog);
     }
 }
