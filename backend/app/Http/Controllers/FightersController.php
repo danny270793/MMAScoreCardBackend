@@ -19,7 +19,7 @@ class FightersController extends Controller
 
     public function index()
     {
-        $fighters = Fighter::paginate(10);
+        $fighters = Fighter::orderBy('name', 'asc')->paginate(10);
 
         return response()
             ->json($fighters);
