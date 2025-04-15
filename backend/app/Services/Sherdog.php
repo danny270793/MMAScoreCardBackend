@@ -358,10 +358,15 @@ class Sherdog
             }
         }
 
-        $spans = $dom->getElementsByTagName('span');
-        foreach ($spans as $span) {
-            if ($span->getAttribute('class') === 'weight_class') {
-                $divisionName = trim($span->textContent);
+        $divs = $dom->getElementsByTagName('div');
+        foreach ($divs as $div) {
+            if ($div->getAttribute('class') === 'fight_card') {
+                $spans = $div->getElementsByTagName('span');
+                foreach ($spans as $span) {
+                    if ($span->getAttribute('class') === 'weight_class') {
+                        $divisionName = trim($span->textContent);
+                    }
+                }
             }
         }
 
