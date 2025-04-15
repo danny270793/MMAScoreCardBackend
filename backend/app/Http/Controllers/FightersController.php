@@ -4,10 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Fight;
 use App\Models\Fighter;
+use App\Models\Streak;
 use Illuminate\Http\Request;
+use App\Services\Sherdog;
 
 class FightersController extends Controller
 {
+    private $sherdog;
+
+    public function __construct(Sherdog $sherdog)
+    {
+        $this->sherdog = $sherdog;
+    }
+
     public function index()
     {
         $fighters = Fighter::paginate(10);
@@ -50,5 +59,12 @@ class FightersController extends Controller
         return response()
             ->json($fighters);
 
+    }
+
+    public function stats($id)
+    {
+        $streaks = Streak::where('fighter_id', $id)->get();
+        return response()
+            ->json($streaks);
     }
 }

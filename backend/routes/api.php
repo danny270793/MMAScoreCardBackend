@@ -18,6 +18,7 @@ Route::get('/fighters', [FightersController::class, 'index']);
 Route::get('/fighters/search', [FightersController::class, 'search']);
 Route::get('/fighters/{id}', [FightersController::class, 'get']);
 Route::get('/fighters/{id}/fights', [FightersController::class, 'fightsByFighter']);
+Route::get('/fighters/{id}/stats', [FightersController::class, 'stats']);
 
 Route::get('/divisions', [DivisionsController::class, 'index']);
 Route::get('/divisions/{id}', [DivisionsController::class, 'get']);
