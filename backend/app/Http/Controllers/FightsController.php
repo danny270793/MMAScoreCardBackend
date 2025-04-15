@@ -8,7 +8,7 @@ class FightsController extends Controller
 {
     public function index()
     {
-        $fights = Fight::with('fighter1', 'fighter2', 'division', 'referee')
+        $fights = Fight::with('fighter1', 'fighter2', 'division', 'referee', 'event')
             ->paginate(10);
 
         return response()
@@ -17,7 +17,7 @@ class FightsController extends Controller
 
     public function get($id)
     {
-        $fight = Fight::with('fighter1', 'fighter2', 'division', 'referee')
+        $fight = Fight::with('fighter1', 'fighter2', 'division', 'referee', 'event')
             ->find($id);
 
         return response()
