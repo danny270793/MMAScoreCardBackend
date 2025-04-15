@@ -27,6 +27,7 @@ class RefreshEvents extends Command
         $this->createDivisions($sherdog);
         $this->createFighters($sherdog);
         $this->createFights($sherdog);
+        // get fights from outside ufc
         $this->createStats($sherdog);
     }
 
