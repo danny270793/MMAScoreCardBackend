@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\Fight;
 use App\Models\Fighter;
 use App\Models\Referee;
+use App\Models\Streak;
 use App\Services\Cache;
 use App\Services\Sherdog;
 use Illuminate\Console\Command;
@@ -26,6 +27,32 @@ class RefreshEvents extends Command
         $this->createDivisions($sherdog);
         $this->createFighters($sherdog);
         $this->createFights($sherdog);
+        $this->createStats($sherdog);
+    }
+
+    private function createStats(Sherdog $sherdog)
+    {
+        $this->info('Getting stats');
+        Streak::truncate();
+
+        $this->withProgressBar(Fighter::all(), function ($fighter) use ($sherdog) {
+            $fights = Fight::where('fighter1_id', $fighter['id'])
+                ->orWhere('fighter2_id', $fighter['id'])
+                ->join('events', 'fights.event_id', '=', 'events.id')
+                ->orderBy('events.date', 'desc')
+                ->get();
+            
+            $streaks = $sherdog->getFightStatsFromFighter($fights, $fighter);
+            foreach($streaks as $currentStreak) {
+                $streak = new Streak;
+                $streak->result = $currentStreak['type'];
+                $streak->counter = $currentStreak['counter'];
+                $streak->from = $currentStreak['from'];
+                $streak->to = $currentStreak['to'];
+                $streak->fighter_id = $fighter->id;
+                $streak->save();
+            }
+        });
     }
 
     private function createEvents(Sherdog $sherdog, Cache $cache, $force)
