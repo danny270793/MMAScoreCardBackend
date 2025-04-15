@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Fight extends Model
 {
@@ -20,6 +19,7 @@ class Fight extends Model
         'referee_id',
         'round',
         'time',
+        'state',
     ];
 
     public function event(): BelongsTo

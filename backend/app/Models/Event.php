@@ -13,11 +13,12 @@ class Event extends Model
         'location',
         'country',
         'date',
-        'link'
+        'link',
+        'state',
     ];
 
     protected $hidden = [
-        'link'
+        'link',
     ];
 
     public function fights(): HasMany

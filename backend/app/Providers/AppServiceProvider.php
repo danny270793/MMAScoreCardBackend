@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use App\Services\Sherdog;
 use App\Services\Cache;
 use App\Services\DatabaseCache;
+use App\Services\Sherdog;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,10 +15,11 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(Cache::class, function ($app) {
-            return new DatabaseCache();
+            return new DatabaseCache;
         });
         $this->app->singleton(Sherdog::class, function ($app) {
             $cache = $app->make(Cache::class);
+
             return new Sherdog($cache);
         });
     }

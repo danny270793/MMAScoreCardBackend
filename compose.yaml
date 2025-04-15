@@ -3,6 +3,17 @@ networks:
     driver: bridge
 
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./dockerfile
+    ports:
+      - ${FRONTEND_PORT}:5173
+    volumes:
+      - ./frontend/src:/app/src
+    networks:
+      - network
+
   backend:
     build:
       context: ./backend
@@ -13,7 +24,5 @@ services:
       DB_CONNECTION: sqlite
     volumes:
       - ./backend:/app
-    depends_on:
-      - postgres
     networks:
       - network

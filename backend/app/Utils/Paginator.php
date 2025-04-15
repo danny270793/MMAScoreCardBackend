@@ -10,6 +10,7 @@ class Paginator
     {
         $page = LengthAwarePaginator::resolveCurrentPage();
         $currentItems = array_slice($items, ($page - 1) * $perPage, $perPage);
+
         return new LengthAwarePaginator(
             $currentItems,
             count($items),

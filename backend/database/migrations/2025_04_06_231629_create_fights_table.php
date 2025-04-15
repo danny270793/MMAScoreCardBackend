@@ -24,6 +24,7 @@ return new class extends Migration
             $table->foreignId('referee_id')->nullable()->constrained('referees')->onDelete('cascade');
             $table->integer('round')->nullable();
             $table->string('time')->nullable();
+            $table->enum('state', ['upcoming', 'finished']);
             $table->timestamps();
         });
     }

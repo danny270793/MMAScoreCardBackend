@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
-
 abstract class Cache
 {
-    public abstract function get($key);
+    abstract public function get($key);
 
-    public abstract function has($key);
+    abstract public function has($key);
 
-    public abstract function put($key, $value);
+    abstract public function put($key, $value);
+
+    abstract public function remove($key);
 }

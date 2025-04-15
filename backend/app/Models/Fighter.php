@@ -20,7 +20,7 @@ class Fighter extends Model
     ];
 
     protected $hidden = [
-        'link'
+        'link',
     ];
 
     public function fights(): HasMany

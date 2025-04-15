@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('events', function (Blueprint $table) {
+        Schema::create('streaks', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('fight')->nullable();
-            $table->string('location');
-            $table->string('country');
-            $table->string('link');
-            $table->date('date');
-            $table->enum('state', ['upcoming', 'finished']);
+            $table->string('result');
+            $table->integer('counter');
+            $table->date('from');
+            $table->date('to');
+            $table->foreignId('fighter_id')->constrained('fighters')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('events');
+        Schema::dropIfExists('streaks');
     }
 };
