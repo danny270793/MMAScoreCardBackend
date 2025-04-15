@@ -41,9 +41,9 @@ class RefreshEvents extends Command
                 ->join('events', 'fights.event_id', '=', 'events.id')
                 ->orderBy('events.date', 'desc')
                 ->get();
-            
+
             $streaks = $sherdog->getFightStatsFromFighter($fights, $fighter);
-            foreach($streaks as $currentStreak) {
+            foreach ($streaks as $currentStreak) {
                 $streak = new Streak;
                 $streak->result = $currentStreak['type'];
                 $streak->counter = $currentStreak['counter'];

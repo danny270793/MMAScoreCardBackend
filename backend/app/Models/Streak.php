@@ -11,7 +11,7 @@ class Streak extends Model
         'counter',
         'from',
         'to',
-        'fighter_id'
+        'fighter_id',
     ];
 
     public function fighter(): BelongsTo

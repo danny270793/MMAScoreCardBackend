@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Fight;
 use App\Models\Fighter;
 use App\Models\Streak;
-use Illuminate\Http\Request;
 use App\Services\Sherdog;
+use Illuminate\Http\Request;
 
 class FightersController extends Controller
 {
@@ -64,6 +64,7 @@ class FightersController extends Controller
     public function stats($id)
     {
         $streaks = Streak::where('fighter_id', $id)->get();
+
         return response()
             ->json($streaks);
     }

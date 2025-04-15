@@ -21,26 +21,16 @@ class Sherdog
         $this->cache = $cache;
     }
 
-    private function fightStatusForFighter($fight, $fighter)
-    {
-        if ($fight->fighter1->id === $fighter->id) {
-            return $fight->fighter1_result;
-        } else if ($fight->fighter2->id === $fighter->id) {
-            return $fight->fighter2_result;
-        }
-        return null;
-    }
-
     public function getFightStatsFromFighter($fights, $fighter)
     {
         $streaks = [];
         foreach ($fights as $fight) {
-            if(count($streaks) === 0) {
+            if (count($streaks) === 0) {
                 $streak = [
                     'counter' => 1,
                     'type' => $this->fightStatusForFighter($fight, $fighter),
                     'from' => $fight->event->date,
-                    'to' => $fight->event->date
+                    'to' => $fight->event->date,
                 ];
                 $streaks[] = $streak;
             } else {
@@ -55,11 +45,12 @@ class Sherdog
                         'type' => $type,
                         'counter' => 1,
                         'from' => $fight->event->date,
-                        'to' => $fight->event->date
+                        'to' => $fight->event->date,
                     ];
                 }
             }
         }
+
         return $streaks;
     }
 
@@ -1102,5 +1093,16 @@ class Sherdog
         $this->executeOnEachEvent(function ($event) use ($callback) {
             $this->executeOnEachFightsFromEvent($event, $callback);
         });
+    }
+
+    private function fightStatusForFighter($fight, $fighter)
+    {
+        if ($fight->fighter1->id === $fighter->id) {
+            return $fight->fighter1_result;
+        } elseif ($fight->fighter2->id === $fighter->id) {
+            return $fight->fighter2_result;
+        }
+
+        return null;
     }
 }
