@@ -129,6 +129,9 @@ class Sherdog
 
                 $parts = explode(',', $location);
                 $city = trim($parts[1]);
+                if($city == null) {
+                    $city = 'NO CITY';
+                }
 
                 $location = trim($words[0]);
 
@@ -936,8 +939,8 @@ class Sherdog
 
         return [
             'nickname' => $nickname ?? null,
-            'country' => $nationality ?? null,
-            'city' => $city ?? null,
+            'country' => $nationality ?? 'NO COUNTRY',
+            'city' => $city ?? 'NO CITY',
             'birthday' => $birthday,
             'died' => $died ?? null,
             'height' => $height,

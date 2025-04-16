@@ -26,17 +26,15 @@ class RefreshEvents extends Command
 
         $this->createCities($sherdog, $cache, $force === 'true');
         $this->createEvents($sherdog, $cache);
-        
         $this->createReferees($sherdog);
         $this->createDivisions($sherdog);
-        // TODO: extract country from fighter to an external entity
-        // TODO: add fighter photo
+        // // TODO: add fighter photo
         $this->createFighters($sherdog);
-        // TODO: separate "method (detail)" to "method" and "detail"
-        $this->createFights($sherdog);
-        // TODO: get fights from outside ufc (from fighter history)
-        $this->createStats($sherdog);
-        // TODO: create record (key, value) example (octagon time, 1h56m34s)
+        // // TODO: separate "method (detail)" to "method" and "detail"
+        // $this->createFights($sherdog);
+        // // TODO: get fights from outside ufc (from fighter history)
+        // $this->createStats($sherdog);
+        // // TODO: create record (key, value) example (octagon time, 1h56m34s)
     }
 
     private function createStats(Sherdog $sherdog)
@@ -235,6 +233,23 @@ class RefreshEvents extends Command
         $this->info('Getting fighters');
         $this->withProgressBar(Event::all(), function ($event) use ($sherdog) {
             $sherdog->executeOnEachFightersFromEvent($event, function ($eachFighter) {
+                $country = Country::where('name', $eachFighter['country'])->first();
+                if ($country === null) {
+                    $country = new Country;
+                }
+
+                $country->name = $eachFighter['country'];
+                $country->save();
+
+
+                $city = City::where('name', $eachFighter['city'])->where('country_id', $country->id)->first();
+                if ($city === null) {
+                    $city = new City;
+                }
+                $city->name = $eachFighter['city'];
+                $city->country_id = $country->id;
+                $city->save();
+
                 $fighter = Fighter::where('name', $eachFighter['name'])->first();
                 if ($fighter === null) {
                     $fighter = new Fighter;
@@ -242,8 +257,7 @@ class RefreshEvents extends Command
                 $fighter->name = $eachFighter['name'];
                 $fighter->link = $eachFighter['link'];
                 $fighter->nickname = $eachFighter['nickname'];
-                $fighter->country = $eachFighter['country'];
-                $fighter->city = $eachFighter['city'];
+                $fighter->city_id = $city->id;
                 $fighter->birthday = $eachFighter['birthday'];
                 $fighter->died = $eachFighter['died'];
                 $fighter->height = $eachFighter['height'];
