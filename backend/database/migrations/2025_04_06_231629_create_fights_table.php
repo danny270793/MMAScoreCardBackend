@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('fighter2_result')->nullable();
             $table->foreignId('division_id')->nullable()->constrained('divisions')->onDelete('cascade');
             $table->string('method')->nullable();
+            $table->string('method_detail')->nullable();
             $table->foreignId('referee_id')->nullable()->constrained('referees')->onDelete('cascade');
             $table->integer('round')->nullable();
             $table->string('time')->nullable();

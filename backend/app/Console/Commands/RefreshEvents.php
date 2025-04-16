@@ -30,9 +30,8 @@ class RefreshEvents extends Command
         $this->createDivisions($sherdog);
         // // TODO: add fighter photo
         $this->createFighters($sherdog);
-        // // TODO: separate "method (detail)" to "method" and "detail"
-        // $this->createFights($sherdog);
         // // TODO: get fights from outside ufc (from fighter history)
+        $this->createFights($sherdog);
         // $this->createStats($sherdog);
         // // TODO: create record (key, value) example (octagon time, 1h56m34s)
     }
@@ -86,6 +85,7 @@ class RefreshEvents extends Command
         $this->withProgressBar(Country::all(), function ($country) {});
         $this->newLine();
         $this->comment(Country::count().' countries on database');
+        $this->comment(City::count().' cities on database');
     }
 
     private function createEvents(Sherdog $sherdog, Cache $cache)
@@ -335,6 +335,7 @@ class RefreshEvents extends Command
                     $fight->division_id = $division->id;
                 }
                 $fight->method = $eachFight['method'];
+                $fight->method_detail = $eachFight['methodDetail'];
                 if ($referee !== null) {
                     $fight->referee_id = $referee->id;
                 }
@@ -346,5 +347,7 @@ class RefreshEvents extends Command
         });
         $this->newLine();
         $this->comment(Fight::count().' fights on database');
+        $this->comment(Country::count().' countries on database');
+        $this->comment(City::count().' cities on database');
     }
 }
