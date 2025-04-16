@@ -78,7 +78,7 @@ class Sherdog
         return $html;
     }
 
-    public function executeOnEachEventFromPage($page, $callback, $forceRefresh)
+    public function executeOnEachEventFromPage($page, $callback, $forceRefresh = false)
     {
         $eventsCounter = 0;
 
@@ -242,13 +242,31 @@ class Sherdog
     //     return $events;
     // }
 
-    public function executeOnEachEvent($forceRefresh, $callback)
+    public function executeOnEachCountry($forceRefresh, $callback)
     {
         $pageHasEvents = true;
         $page = 1;
         while ($pageHasEvents) {
             $refreshPage = $forceRefresh && $page === 1;
-            $pageEvents = $this->executeOnEachEventFromPage($page, $callback, $refreshPage);
+            $pageEvents = $this->executeOnEachEventFromPage($page, function($eachEvent) use ($callback) {
+                $country = [
+                    'name' => $eachEvent['country'],
+                ];
+                $callback($country);
+            }, $refreshPage);
+            if ($pageEvents === 0) {
+                $pageHasEvents = false;
+            }
+            $page += 1;
+        }
+    }
+
+    public function executeOnEachEvent($callback)
+    {
+        $pageHasEvents = true;
+        $page = 1;
+        while ($pageHasEvents) {
+            $pageEvents = $this->executeOnEachEventFromPage($page, $callback);
             if ($pageEvents === 0) {
                 $pageHasEvents = false;
             }

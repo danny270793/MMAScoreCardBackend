@@ -11,7 +11,7 @@ class Event extends Model
         'name',
         'fight',
         'location',
-        'country',
+        'country_id',
         'date',
         'link',
         'state',
@@ -20,6 +20,11 @@ class Event extends Model
     protected $hidden = [
         'link',
     ];
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
 
     public function fights(): HasMany
     {

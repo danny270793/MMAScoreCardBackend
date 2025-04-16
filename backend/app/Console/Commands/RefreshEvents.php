@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Country;
 use App\Models\Division;
 use App\Models\Event;
 use App\Models\Fight;
@@ -22,8 +23,8 @@ class RefreshEvents extends Command
     {
         $force = $this->option('force');
 
-        // TODO: extract country from event to an external entity
-        $this->createEvents($sherdog, $cache, $force === 'true');
+        $this->createCountries($sherdog, $cache, $force === 'true');
+        $this->createEvents($sherdog, $cache);
         $this->createReferees($sherdog);
         $this->createDivisions($sherdog);
         // TODO: extract country from fighter to an external entity
@@ -61,7 +62,24 @@ class RefreshEvents extends Command
         });
     }
 
-    private function createEvents(Sherdog $sherdog, Cache $cache, $force)
+    private function createCountries(Sherdog $sherdog, Cache $cache, $force)
+    {
+        $this->info('Getting countries');
+        $sherdog->executeOnEachCountry($force, function ($eachCountry) use ($cache) {
+            $country = Country::where('name', $eachCountry['name'])->first();
+            if ($country === null) {
+                $country = new Country;
+            }
+
+            $country->name = $eachCountry['name'];
+            $country->save();
+        });
+        $this->withProgressBar(Country::all(), function ($country) {});
+        $this->newLine();
+        $this->comment(Country::count().' countries on database');
+    }
+
+    private function createEvents(Sherdog $sherdog, Cache $cache)
     {
         // $events = $sherdog->getEvents();
         // $eventsCount = count($events);
@@ -84,7 +102,9 @@ class RefreshEvents extends Command
         // }
 
         $this->info('Getting events');
-        $sherdog->executeOnEachEvent($force, function ($eachEvent) use ($cache) {
+        $sherdog->executeOnEachEvent(function ($eachEvent) use ($cache) {
+            $country = Country::where('name', $eachEvent['country'])->first();
+
             $event = Event::where('name', $eachEvent['name'])->first();
             if ($event === null) {
                 $event = new Event;
@@ -98,7 +118,7 @@ class RefreshEvents extends Command
             $event->name = $eachEvent['name'];
             $event->fight = $eachEvent['fight'];
             $event->location = $eachEvent['location'];
-            $event->country = $eachEvent['country'];
+            $event->country_id = $country->id;
             $event->date = $eachEvent['date'];
             $event->link = $eachEvent['link'];
             $event->state = $eachEvent['state'];
