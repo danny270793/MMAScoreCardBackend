@@ -22,18 +22,18 @@ class RefreshEvents extends Command
     {
         $force = $this->option('force');
 
-        // extract country from event to an external entity
+        // TODO: extract country from event to an external entity
         $this->createEvents($sherdog, $cache, $force === 'true');
         $this->createReferees($sherdog);
         $this->createDivisions($sherdog);
-        // extract country from fighter to an external entity
-        // add fighter photo
+        // TODO: extract country from fighter to an external entity
+        // TODO: add fighter photo
         $this->createFighters($sherdog);
-        // separate "method (detail)" to "method" and "detail"
+        // TODO: separate "method (detail)" to "method" and "detail"
         $this->createFights($sherdog);
-        // get fights from outside ufc (from fighter history)
+        // TODO: get fights from outside ufc (from fighter history)
         $this->createStats($sherdog);
-        // create record (key, value) example (octagon time, 1h56m34s)
+        // TODO: create record (key, value) example (octagon time, 1h56m34s)
     }
 
     private function createStats(Sherdog $sherdog)
