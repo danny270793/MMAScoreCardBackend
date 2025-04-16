@@ -422,6 +422,11 @@ class Sherdog
         }
         $divisionName = trim($divisionName);
 
+        $parts = explode('(', $method);
+        $method = trim($parts[0]);
+        $rest = array_slice($parts, 1);
+        $methodDetail = rtrim(trim(implode('(', $rest)), ')');
+
         $fight = [
             'position' => $position,
             'fighter1Name' => $fighter1Name,
@@ -432,6 +437,7 @@ class Sherdog
             'fighter2Link' => $fighter2Link,
             'fighter2Result' => $fighter2Result,
             'method' => $method,
+            'methodDetail' => $methodDetail,
             'referee' => $refereeName,
             'round' => $round,
             'time' => $time,
@@ -513,7 +519,7 @@ class Sherdog
                 $parts = explode('(', $method);
                 $method = trim($parts[0]);
                 $rest = array_slice($parts, 1);
-                $methodDetail = trim(implode('(', $rest));
+                $methodDetail = rtrim(trim(implode('(', $rest)), ')');
 
 
                 $fight = [
@@ -1071,6 +1077,7 @@ class Sherdog
                 'fighter2_result' => $fight['fighter2Result'],
                 'division' => $fight['division'],
                 'method' => $fight['method'],
+                'method_detail' => $fight['methodDetail'],
                 'referee' => $fight['referee'],
                 'round' => $fight['round'],
                 'time' => $fight['time'],

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Division;
+use App\Models\Record;
 use App\Models\Event;
 use App\Models\Fight;
 use App\Models\Fighter;
@@ -32,8 +33,60 @@ class RefreshEvents extends Command
         $this->createFighters($sherdog);
         // // TODO: get fights from outside ufc (from fighter history)
         $this->createFights($sherdog);
-        // $this->createStats($sherdog);
-        // // TODO: create record (key, value) example (octagon time, 1h56m34s)
+        $this->createStats($sherdog);
+        $this->createRecords($sherdog);
+    }
+
+    private function createRecords(Sherdog $sherdog)
+    {
+        $this->info('Getting recods');
+        Record::truncate();
+
+        $this->withProgressBar(Fighter::all(), function ($fighter) use ($sherdog) {
+            $fights = Fight::where('fighter_id', $fighter['id'])->where('state', 'finished')->get();
+
+            $wins = 0;
+            $losses = 0;
+            $draws = 0;
+            $ncs = 0;
+            $octagonSeconds = 0;
+            foreach($fights as $fight) {
+                $parts = explode(':', $fight->time);
+                $octagonSeconds += (int) $parts[0] * 60 + (int) $parts[1];
+
+                if($fight->fighter1_id === $fighter->id) {
+                    if($fight->fighter1_result === 'win') {
+                        $wins+=1;
+                    } else if($fight->fighter1_result === 'loss') {
+                        $losses+=1;
+                    } else if($fight->fighter1_result === 'draw') {
+                        $draws+=1;
+                    } else if($fight->fighter1_result === 'nc') {
+                        $ncs+=1;
+                    }
+                } else if($fight->fighter2_id === $fighter->id) {
+                    if($fight->fighter2_result === 'win') {
+                        $wins+=1;
+                    } else if($fight->fighter2_result === 'loss') {
+                        $losses+=1;
+                    } else if($fight->fighter2_result === 'draw') {
+                        $draws+=1;
+                    } else if($fight->fighter2_result === 'nc') {
+                        $ncs+=1;
+                    }
+                }
+            }
+
+            Record::create(['name' => 'fights', 'value' => count($fights), 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'wins', 'value' => $wins, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'losses', 'value' => $losses, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'ncs', 'value' => $ncs, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'draws', 'value' => $draws, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'octagon time', 'value' => $octagonSeconds, 'fighter_id' => $fighter['id']]);
+        });
+
+        $this->newLine();
+        $this->comment(Record::count().' records on database');
     }
 
     private function createStats(Sherdog $sherdog)
@@ -42,8 +95,11 @@ class RefreshEvents extends Command
         Streak::truncate();
 
         $this->withProgressBar(Fighter::all(), function ($fighter) use ($sherdog) {
-            $fights = Fight::where('fighter1_id', $fighter['id'])
-                ->orWhere('fighter2_id', $fighter['id'])
+            $fights = Fight::where('state', 'finished')
+                ->where(function($query) {
+                    $query->where('fighter1_id', $fighter['id'])
+                        ->orWhere('fighter2_id', $fighter['id']);
+                })
                 ->join('events', 'fights.event_id', '=', 'events.id')
                 ->orderBy('events.date', 'desc')
                 ->get();
@@ -59,6 +115,8 @@ class RefreshEvents extends Command
                 $streak->save();
             }
         });
+        $this->newLine();
+        $this->comment(Streak::count().' streaks on database');
     }
 
     private function createCities(Sherdog $sherdog, Cache $cache, $force)
@@ -335,7 +393,7 @@ class RefreshEvents extends Command
                     $fight->division_id = $division->id;
                 }
                 $fight->method = $eachFight['method'];
-                $fight->method_detail = $eachFight['methodDetail'];
+                $fight->method_detail = $eachFight['method_detail'];
                 if ($referee !== null) {
                     $fight->referee_id = $referee->id;
                 }
