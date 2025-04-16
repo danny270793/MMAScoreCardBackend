@@ -27,7 +27,7 @@ class EventsController extends Controller
     public function fightsByEvent($id)
     {
         $fights = Fight::orderBy('position', 'desc')->where('event_id', $id)
-            ->with('fighter1', 'fighter2', 'division', 'referee')
+            ->with('fighter1', 'fighter2', 'division', 'referee', 'event')
             ->paginate(10);
 
         return response()
