@@ -129,7 +129,7 @@ class Sherdog
 
                 $parts = explode(',', $location);
                 $city = trim($parts[1]);
-                if($city == null) {
+                if ($city === null) {
                     $city = 'NO CITY';
                 }
 
@@ -255,7 +255,7 @@ class Sherdog
         $page = 1;
         while ($pageHasEvents) {
             $refreshPage = $forceRefresh && $page === 1;
-            $pageEvents = $this->executeOnEachEventFromPage($page, function($eachEvent) use ($callback) {
+            $pageEvents = $this->executeOnEachEventFromPage($page, function ($eachEvent) use ($callback) {
                 $country = [
                     'country' => $eachEvent['country'],
                     'city' => $eachEvent['city'],
@@ -520,7 +520,6 @@ class Sherdog
                 $method = trim($parts[0]);
                 $rest = array_slice($parts, 1);
                 $methodDetail = rtrim(trim(implode('(', $rest)), ')');
-
 
                 $fight = [
                     'position' => $position,

@@ -5,10 +5,10 @@ namespace App\Console\Commands;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\Division;
-use App\Models\Record;
 use App\Models\Event;
 use App\Models\Fight;
 use App\Models\Fighter;
+use App\Models\Record;
 use App\Models\Referee;
 use App\Models\Streak;
 use App\Services\Cache;
@@ -42,7 +42,7 @@ class RefreshEvents extends Command
         $this->info('Getting recods');
         Record::truncate();
 
-        $this->withProgressBar(Fighter::all(), function ($fighter) use ($sherdog) {
+        $this->withProgressBar(Fighter::all(), function ($fighter) {
             $fights = Fight::where('fighter_id', $fighter['id'])->where('state', 'finished')->get();
 
             $wins = 0;
@@ -50,29 +50,29 @@ class RefreshEvents extends Command
             $draws = 0;
             $ncs = 0;
             $octagonSeconds = 0;
-            foreach($fights as $fight) {
+            foreach ($fights as $fight) {
                 $parts = explode(':', $fight->time);
                 $octagonSeconds += (int) $parts[0] * 60 + (int) $parts[1];
 
-                if($fight->fighter1_id === $fighter->id) {
-                    if($fight->fighter1_result === 'win') {
-                        $wins+=1;
-                    } else if($fight->fighter1_result === 'loss') {
-                        $losses+=1;
-                    } else if($fight->fighter1_result === 'draw') {
-                        $draws+=1;
-                    } else if($fight->fighter1_result === 'nc') {
-                        $ncs+=1;
+                if ($fight->fighter1_id === $fighter->id) {
+                    if ($fight->fighter1_result === 'win') {
+                        $wins += 1;
+                    } elseif ($fight->fighter1_result === 'loss') {
+                        $losses += 1;
+                    } elseif ($fight->fighter1_result === 'draw') {
+                        $draws += 1;
+                    } elseif ($fight->fighter1_result === 'nc') {
+                        $ncs += 1;
                     }
-                } else if($fight->fighter2_id === $fighter->id) {
-                    if($fight->fighter2_result === 'win') {
-                        $wins+=1;
-                    } else if($fight->fighter2_result === 'loss') {
-                        $losses+=1;
-                    } else if($fight->fighter2_result === 'draw') {
-                        $draws+=1;
-                    } else if($fight->fighter2_result === 'nc') {
-                        $ncs+=1;
+                } elseif ($fight->fighter2_id === $fighter->id) {
+                    if ($fight->fighter2_result === 'win') {
+                        $wins += 1;
+                    } elseif ($fight->fighter2_result === 'loss') {
+                        $losses += 1;
+                    } elseif ($fight->fighter2_result === 'draw') {
+                        $draws += 1;
+                    } elseif ($fight->fighter2_result === 'nc') {
+                        $ncs += 1;
                     }
                 }
             }
@@ -96,7 +96,7 @@ class RefreshEvents extends Command
 
         $this->withProgressBar(Fighter::all(), function ($fighter) use ($sherdog) {
             $fights = Fight::where('state', 'finished')
-                ->where(function($query) {
+                ->where(function ($query) {
                     $query->where('fighter1_id', $fighter['id'])
                         ->orWhere('fighter2_id', $fighter['id']);
                 })
@@ -122,7 +122,7 @@ class RefreshEvents extends Command
     private function createCities(Sherdog $sherdog, Cache $cache, $force)
     {
         $this->info('Getting countries');
-        $sherdog->executeOnEachCity($force, function ($eachCountry) use ($cache) {
+        $sherdog->executeOnEachCity($force, function ($eachCountry) {
             $country = Country::where('name', $eachCountry['country'])->first();
             if ($country === null) {
                 $country = new Country;
@@ -130,7 +130,6 @@ class RefreshEvents extends Command
 
             $country->name = $eachCountry['country'];
             $country->save();
-
 
             $city = City::where('name', $eachCountry['city'])->where('country_id', $country->id)->first();
             if ($city === null) {
@@ -298,7 +297,6 @@ class RefreshEvents extends Command
 
                 $country->name = $eachFighter['country'];
                 $country->save();
-
 
                 $city = City::where('name', $eachFighter['city'])->where('country_id', $country->id)->first();
                 if ($city === null) {
