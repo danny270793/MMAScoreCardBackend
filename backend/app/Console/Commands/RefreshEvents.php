@@ -43,7 +43,12 @@ class RefreshEvents extends Command
         Record::truncate();
 
         $this->withProgressBar(Fighter::all(), function ($fighter) {
-            $fights = Fight::where('fighter_id', $fighter['id'])->where('state', 'finished')->get();
+            $fights = Fight::where('state', 'finished')
+                ->where(function ($query) use ($fighter) {
+                    $query->where('fighter1_id', $fighter['id'])
+                        ->orWhere('fighter2_id', $fighter['id']);
+                })
+                ->get();
 
             $wins = 0;
             $losses = 0;
@@ -95,8 +100,8 @@ class RefreshEvents extends Command
         Streak::truncate();
 
         $this->withProgressBar(Fighter::all(), function ($fighter) use ($sherdog) {
-            $fights = Fight::where('state', 'finished')
-                ->where(function ($query) {
+            $fights = Fight::where('fights.state', 'finished')
+                ->where(function ($query) use ($fighter) {
                     $query->where('fighter1_id', $fighter['id'])
                         ->orWhere('fighter2_id', $fighter['id']);
                 })
