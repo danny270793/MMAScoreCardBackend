@@ -126,14 +126,18 @@ class Sherdog
                 $location = trim($columns->item(2)->textContent);
                 $words = explode(',', $location);
                 $country = trim(end($words));
-                array_pop($words);
-                $location = trim(implode(',', $words));
+
+                $parts = explode(',', $location);
+                $city = trim($parts[1]);
+
+                $location = trim($words[0]);
 
                 $event = [
                     'name' => $eventName,
                     'fight' => $mainFight,
                     'location' => $location,
                     'country' => $country,
+                    'city' => $city,
                     'date' => $date,
                     'link' => "$this->baseUrl$link",
                     'state' => $tableNumber === 0 ? 'upcoming' : 'finished',
@@ -242,7 +246,7 @@ class Sherdog
     //     return $events;
     // }
 
-    public function executeOnEachCountry($forceRefresh, $callback)
+    public function executeOnEachCity($forceRefresh, $callback)
     {
         $pageHasEvents = true;
         $page = 1;
@@ -250,7 +254,8 @@ class Sherdog
             $refreshPage = $forceRefresh && $page === 1;
             $pageEvents = $this->executeOnEachEventFromPage($page, function($eachEvent) use ($callback) {
                 $country = [
-                    'name' => $eachEvent['country'],
+                    'country' => $eachEvent['country'],
+                    'city' => $eachEvent['city'],
                 ];
                 $callback($country);
             }, $refreshPage);

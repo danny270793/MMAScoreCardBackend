@@ -11,7 +11,7 @@ class Event extends Model
         'name',
         'fight',
         'location',
-        'country_id',
+        'city_id',
         'date',
         'link',
         'state',
@@ -21,9 +21,9 @@ class Event extends Model
         'link',
     ];
 
-    public function country(): BelongsTo
+    public function city(): BelongsTo
     {
-        return $this->belongsTo(Country::class);
+        return $this->belongsTo(City::class);
     }
 
     public function fights(): HasMany

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('fight')->nullable();
             $table->string('location');
-            $table->foreignId('country_id')->nullable()->constrained('countries')->onDelete('cascade');
+            $table->foreignId('city_id')->nullable()->constrained('cities')->onDelete('cascade');
             $table->string('link');
             $table->date('date');
             $table->enum('state', ['upcoming', 'finished']);

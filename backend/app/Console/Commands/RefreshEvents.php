@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\City;
 use App\Models\Country;
 use App\Models\Division;
 use App\Models\Event;
@@ -23,8 +24,9 @@ class RefreshEvents extends Command
     {
         $force = $this->option('force');
 
-        $this->createCountries($sherdog, $cache, $force === 'true');
+        $this->createCities($sherdog, $cache, $force === 'true');
         $this->createEvents($sherdog, $cache);
+        
         $this->createReferees($sherdog);
         $this->createDivisions($sherdog);
         // TODO: extract country from fighter to an external entity
@@ -62,17 +64,26 @@ class RefreshEvents extends Command
         });
     }
 
-    private function createCountries(Sherdog $sherdog, Cache $cache, $force)
+    private function createCities(Sherdog $sherdog, Cache $cache, $force)
     {
         $this->info('Getting countries');
-        $sherdog->executeOnEachCountry($force, function ($eachCountry) use ($cache) {
-            $country = Country::where('name', $eachCountry['name'])->first();
+        $sherdog->executeOnEachCity($force, function ($eachCountry) use ($cache) {
+            $country = Country::where('name', $eachCountry['country'])->first();
             if ($country === null) {
                 $country = new Country;
             }
 
-            $country->name = $eachCountry['name'];
+            $country->name = $eachCountry['country'];
             $country->save();
+
+
+            $city = City::where('name', $eachCountry['city'])->where('country_id', $country->id)->first();
+            if ($city === null) {
+                $city = new City;
+            }
+            $city->name = $eachCountry['city'];
+            $city->country_id = $country->id;
+            $city->save();
         });
         $this->withProgressBar(Country::all(), function ($country) {});
         $this->newLine();
@@ -104,6 +115,7 @@ class RefreshEvents extends Command
         $this->info('Getting events');
         $sherdog->executeOnEachEvent(function ($eachEvent) use ($cache) {
             $country = Country::where('name', $eachEvent['country'])->first();
+            $city = City::where('name', $eachEvent['city'])->where('country_id', $country->id)->first();
 
             $event = Event::where('name', $eachEvent['name'])->first();
             if ($event === null) {
@@ -118,7 +130,7 @@ class RefreshEvents extends Command
             $event->name = $eachEvent['name'];
             $event->fight = $eachEvent['fight'];
             $event->location = $eachEvent['location'];
-            $event->country_id = $country->id;
+            $event->city_id = $city->id;
             $event->date = $eachEvent['date'];
             $event->link = $eachEvent['link'];
             $event->state = $eachEvent['state'];
