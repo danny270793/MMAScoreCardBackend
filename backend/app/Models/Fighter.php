@@ -11,8 +11,7 @@ class Fighter extends Model
         'name',
         'link',
         'nickname',
-        'country',
-        'city',
+        'city_id',
         'birthday',
         'died',
         'height',
@@ -22,6 +21,11 @@ class Fighter extends Model
     protected $hidden = [
         'link',
     ];
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
+    }
 
     public function fights(): HasMany
     {

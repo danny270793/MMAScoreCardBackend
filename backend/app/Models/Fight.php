@@ -16,6 +16,7 @@ class Fight extends Model
         'fighter2_result',
         'division_id',
         'method',
+        'method_detail',
         'referee_id',
         'round',
         'time',

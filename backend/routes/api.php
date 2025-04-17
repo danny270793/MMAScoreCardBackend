@@ -7,6 +7,7 @@ use App\Http\Controllers\FightsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/events', [EventsController::class, 'index']);
+Route::get('/events/upcoming', [EventsController::class, 'upcoming']);
 Route::get('/events/{id}', [EventsController::class, 'get']);
 Route::get('/events/{id}/fights', [EventsController::class, 'fightsByEvent']);
 Route::get('/events/{id}/fighters', [EventsController::class, 'fightersByEvent']);

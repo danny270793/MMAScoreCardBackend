@@ -16,8 +16,7 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->string('link');
             $table->string('nickname')->nullable();
-            $table->string('country')->nullable();
-            $table->string('city')->nullable();
+            $table->foreignId('city_id')->nullable()->constrained('cities')->onDelete('cascade');
             $table->date('birthday');
             $table->date('died')->nullable();
             $table->double('height');

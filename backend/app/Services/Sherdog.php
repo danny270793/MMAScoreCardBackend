@@ -78,7 +78,7 @@ class Sherdog
         return $html;
     }
 
-    public function executeOnEachEventFromPage($page, $callback, $forceRefresh)
+    public function executeOnEachEventFromPage($page, $callback, $forceRefresh = false)
     {
         $eventsCounter = 0;
 
@@ -126,14 +126,21 @@ class Sherdog
                 $location = trim($columns->item(2)->textContent);
                 $words = explode(',', $location);
                 $country = trim(end($words));
-                array_pop($words);
-                $location = trim(implode(',', $words));
+
+                $parts = explode(',', $location);
+                $city = trim($parts[1]);
+                if ($city === null) {
+                    $city = 'NO CITY';
+                }
+
+                $location = trim($words[0]);
 
                 $event = [
                     'name' => $eventName,
                     'fight' => $mainFight,
                     'location' => $location,
                     'country' => $country,
+                    'city' => $city,
                     'date' => $date,
                     'link' => "$this->baseUrl$link",
                     'state' => $tableNumber === 0 ? 'upcoming' : 'finished',
@@ -242,13 +249,32 @@ class Sherdog
     //     return $events;
     // }
 
-    public function executeOnEachEvent($forceRefresh, $callback)
+    public function executeOnEachCity($forceRefresh, $callback)
     {
         $pageHasEvents = true;
         $page = 1;
         while ($pageHasEvents) {
             $refreshPage = $forceRefresh && $page === 1;
-            $pageEvents = $this->executeOnEachEventFromPage($page, $callback, $refreshPage);
+            $pageEvents = $this->executeOnEachEventFromPage($page, function ($eachEvent) use ($callback) {
+                $country = [
+                    'country' => $eachEvent['country'],
+                    'city' => $eachEvent['city'],
+                ];
+                $callback($country);
+            }, $refreshPage);
+            if ($pageEvents === 0) {
+                $pageHasEvents = false;
+            }
+            $page += 1;
+        }
+    }
+
+    public function executeOnEachEvent($callback)
+    {
+        $pageHasEvents = true;
+        $page = 1;
+        while ($pageHasEvents) {
+            $pageEvents = $this->executeOnEachEventFromPage($page, $callback);
             if ($pageEvents === 0) {
                 $pageHasEvents = false;
             }
@@ -396,6 +422,11 @@ class Sherdog
         }
         $divisionName = trim($divisionName);
 
+        $parts = explode('(', $method);
+        $method = trim($parts[0]);
+        $rest = array_slice($parts, 1);
+        $methodDetail = rtrim(trim(implode('(', $rest)), ')');
+
         $fight = [
             'position' => $position,
             'fighter1Name' => $fighter1Name,
@@ -406,6 +437,7 @@ class Sherdog
             'fighter2Link' => $fighter2Link,
             'fighter2Result' => $fighter2Result,
             'method' => $method,
+            'methodDetail' => $methodDetail,
             'referee' => $refereeName,
             'round' => $round,
             'time' => $time,
@@ -484,6 +516,11 @@ class Sherdog
                 }
                 $divisionName = trim($divisionName);
 
+                $parts = explode('(', $method);
+                $method = trim($parts[0]);
+                $rest = array_slice($parts, 1);
+                $methodDetail = rtrim(trim(implode('(', $rest)), ')');
+
                 $fight = [
                     'position' => $position,
                     'fighter1Name' => $fighter1Name,
@@ -494,6 +531,7 @@ class Sherdog
                     'fighter2Link' => $fighter2Link,
                     'fighter2Result' => $fighter2Result,
                     'method' => $method,
+                    'methodDetail' => $methodDetail,
                     'referee' => $refereeName,
                     'round' => $round,
                     'time' => $time,
@@ -913,8 +951,8 @@ class Sherdog
 
         return [
             'nickname' => $nickname ?? null,
-            'country' => $nationality ?? null,
-            'city' => $city ?? null,
+            'country' => $nationality ?? 'NO COUNTRY',
+            'city' => $city ?? 'NO CITY',
             'birthday' => $birthday,
             'died' => $died ?? null,
             'height' => $height,
@@ -1038,6 +1076,7 @@ class Sherdog
                 'fighter2_result' => $fight['fighter2Result'],
                 'division' => $fight['division'],
                 'method' => $fight['method'],
+                'method_detail' => $fight['methodDetail'],
                 'referee' => $fight['referee'],
                 'round' => $fight['round'],
                 'time' => $fight['time'],

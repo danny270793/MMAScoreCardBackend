@@ -10,7 +10,15 @@ class EventsController extends Controller
 {
     public function index()
     {
-        $events = Event::orderBy('date', 'desc')->paginate(10);
+        $events = Event::where('state', 'finished')->orderBy('date', 'desc')->paginate(10);
+
+        return response()
+            ->json($events);
+    }
+
+    public function upcoming()
+    {
+        $events = Event::where('state', 'upcoming')->orderBy('date', 'desc')->get();
 
         return response()
             ->json($events);
