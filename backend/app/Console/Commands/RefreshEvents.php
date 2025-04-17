@@ -54,11 +54,7 @@ class RefreshEvents extends Command
             $losses = 0;
             $draws = 0;
             $ncs = 0;
-            $octagonSeconds = 0;
             foreach ($fights as $fight) {
-                $parts = explode(':', $fight->time);
-                $octagonSeconds += (int) $parts[0] * 60 + (int) $parts[1];
-
                 if ($fight->fighter1_id === $fighter->id) {
                     if ($fight->fighter1_result === 'win') {
                         $wins += 1;
@@ -81,13 +77,102 @@ class RefreshEvents extends Command
                     }
                 }
             }
-
             Record::create(['name' => 'fights', 'value' => count($fights), 'fighter_id' => $fighter['id']]);
             Record::create(['name' => 'wins', 'value' => $wins, 'fighter_id' => $fighter['id']]);
             Record::create(['name' => 'losses', 'value' => $losses, 'fighter_id' => $fighter['id']]);
             Record::create(['name' => 'ncs', 'value' => $ncs, 'fighter_id' => $fighter['id']]);
             Record::create(['name' => 'draws', 'value' => $draws, 'fighter_id' => $fighter['id']]);
+
+            $octagonSeconds = 0;
+            foreach ($fights as $fight) {
+                $parts = explode(':', $fight->time);
+                $octagonSeconds += (int) $parts[0] * 60 + (int) $parts[1];
+            }
             Record::create(['name' => 'octagon time', 'value' => $octagonSeconds, 'fighter_id' => $fighter['id']]);
+
+            $kos = 0;
+            $submissions = 0;
+            $decisions = 0;
+            $disqualifications = 0;
+            $noContests = 0;
+            $draw = 0;
+            foreach ($fights as $fight) {
+                if ($fight->fighter1_id === $fighter->id) {
+                    if ($fight->fighter1_result === 'win') {
+                        switch (strtolower($fight->method_detail)) {
+                            case 'ko':
+                            case 'tko':
+                                $kos += 1;
+                                break;
+                            case 'technical submission':
+                            case 'submission':
+                                $submissions += 1;
+                                break;
+                            case 'technical decision':
+                            case 'decision':
+                                $decisions += 1;
+                                break;
+                            case 'disqualification':
+                                $disqualifications += 1;
+                                break;
+                            case 'no contest':
+                                $noContests += 1;
+                                break;
+                            case 'draw':
+                                $draws += 1;
+                                break;
+                        }
+                    }
+                }
+            }
+            Record::create(['name' => 'wins by kos', 'value' => $kos, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'wins by submissions', 'value' => $submissions, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'wins by decisions', 'value' => $decisions, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'wins by disqualifications', 'value' => $disqualifications, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'wins by noContests', 'value' => $noContests, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'wins by draw', 'value' => $draw, 'fighter_id' => $fighter['id']]);
+
+            $kos = 0;
+            $submissions = 0;
+            $decisions = 0;
+            $disqualifications = 0;
+            $noContests = 0;
+            $draw = 0;
+            foreach ($fights as $fight) {
+                if ($fight->fighter1_id === $fighter->id) {
+                    if ($fight->fighter1_result === 'loss') {
+                        switch (str_lower($fight->method_detail)) {
+                            case 'ko':
+                            case 'tko':
+                                $kos += 1;
+                                break;
+                            case 'technical submission':
+                            case 'submission':
+                                $submissions += 1;
+                                break;
+                            case 'technical decision':
+                            case 'decision':
+                                $decisions += 1;
+                                break;
+                            case 'disqualification':
+                                $disqualifications += 1;
+                                break;
+                            case 'no contest':
+                                $noContests += 1;
+                                break;
+                            case 'draw':
+                                $draws += 1;
+                                break;
+                        }
+                    }
+                }
+            }
+            Record::create(['name' => 'losses by kos', 'value' => $kos, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'losses by submissions', 'value' => $submissions, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'losses by decisions', 'value' => $decisions, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'losses by disqualifications', 'value' => $disqualifications, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'losses by noContests', 'value' => $noContests, 'fighter_id' => $fighter['id']]);
+            Record::create(['name' => 'losses by draw', 'value' => $draw, 'fighter_id' => $fighter['id']]);
         });
 
         $this->newLine();

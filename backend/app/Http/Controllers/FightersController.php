@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Fight;
 use App\Models\Fighter;
+use App\Models\Record;
 use App\Models\Streak;
 use App\Services\Sherdog;
 use Illuminate\Http\Request;
@@ -19,7 +20,7 @@ class FightersController extends Controller
 
     public function index()
     {
-        $fighters = Fighter::orderBy('name', 'asc')->paginate(10);
+        $fighters = Fighter::with('city')->orderBy('name', 'asc')->paginate(10);
 
         return response()
             ->json($fighters);
@@ -27,7 +28,7 @@ class FightersController extends Controller
 
     public function get($id)
     {
-        $fighter = Fighter::find($id);
+        $fighter = Fighter::with('city')->find($id);
 
         return response()
             ->json($fighter);
@@ -49,7 +50,8 @@ class FightersController extends Controller
     public function search(Request $request)
     {
         $query = $request->input('query');
-        $fighters = Fighter::where('name', 'LIKE', "%$query%")
+        $fighters = Fighter::with('city')
+            ->where('name', 'LIKE', "%$query%")
             ->orWhere('nickname', 'LIKE', "%$query%")
             ->orWhere('country', 'LIKE', "%$query%")
             ->orWhere('city', 'LIKE', "%$query%")
@@ -61,11 +63,19 @@ class FightersController extends Controller
 
     }
 
-    public function stats($id)
+    public function streaks($id)
     {
         $streaks = Streak::where('fighter_id', $id)->get();
 
         return response()
             ->json($streaks);
+    }
+
+    public function records($id)
+    {
+        $records = Record::where('fighter_id', $id)->get();
+
+        return response()
+            ->json($records);
     }
 }
