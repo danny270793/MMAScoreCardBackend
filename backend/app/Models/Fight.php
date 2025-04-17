@@ -30,12 +30,12 @@ class Fight extends Model
 
     public function fighter1(): BelongsTo
     {
-        return $this->belongsTo(Fighter::class, 'fighter1_id');
+        return $this->belongsTo(Fighter::class, 'fighter1_id')->with('city');
     }
 
     public function fighter2(): BelongsTo
     {
-        return $this->belongsTo(Fighter::class, 'fighter2_id');
+        return $this->belongsTo(Fighter::class, 'fighter2_id')->with('city');
     }
 
     public function division(): BelongsTo
