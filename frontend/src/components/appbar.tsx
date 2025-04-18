@@ -23,7 +23,7 @@ export const AppBar: (props: AppBarProps) => React.ReactElement = (
     <div>
       <div className="w3-top">
         <div className="w3-blue w3-bar">
-          {location.pathname !== '/' && (
+          {!['/', '/index.html'].includes(location.pathname) && (
             <button className="w3-bar-item w3-blue" onClick={onBackClicked}>
               {'<'}
             </button>
