@@ -5,20 +5,25 @@ export interface Link {
 }
 
 export interface Paginator<T> {
-  current_page: number
-  data: T[]
-  first_page_url: string
-  from: number
   last_page: number
-  last_page_url: string
-  links: Link[]
-  next_page_url: string
-  path: string
-  per_page: number
-  prev_page_url: string
-  to: number
-  total: number
+  data: T[]
 }
+
+// export interface Paginator<T> {
+//   current_page: number
+//   data: T[]
+//   first_page_url: string
+//   from: number
+//   last_page: number
+//   last_page_url: string
+//   links: Link[]
+//   next_page_url: string
+//   path: string
+//   per_page: number
+//   prev_page_url: string
+//   to: number
+//   total: number
+// }
 
 export interface Event {
   id: number
@@ -26,7 +31,7 @@ export interface Event {
   fight: string
   location: string
   country: string
-  date: Date|null
+  date: Date | null
   state: string
 }
 
@@ -53,6 +58,21 @@ export interface Fighter {
   weight: number
 }
 
+export interface Record {
+  name: string
+  value: number
+  fighter_id: string
+}
+
+export interface Streak {
+  id: number
+  result: string
+  counter: number
+  from: Date
+  to: Date
+  fighter_id: string
+}
+
 export interface Fight {
   id: number
   position: number
@@ -75,7 +95,7 @@ export interface Fight {
 }
 
 export const backend = {
-  baseUrl: 'http://localhost:8000',
+  baseUrl: import.meta.env.VITE_BACKEND_URL,
   jsonToEvent: (item: Event): Event => ({
     ...item,
     date: item.date === null ? null : new Date(item.date),
@@ -84,6 +104,14 @@ export const backend = {
     ...item,
     birthday: new Date(item.birthday),
     died: item.died !== null ? new Date(item.died) : null,
+  }),
+  jsonToStreak: (item: Streak): Streak => ({
+    ...item,
+    from: new Date(item.from),
+    to: new Date(item.to),
+  }),
+  jsonToRecord: (item: Record): Record => ({
+    ...item,
   }),
   getEvents: async (page: number = 0): Promise<Paginator<Event>> => {
     const response: Response = await fetch(
@@ -123,8 +151,8 @@ export const backend = {
       ...data,
       data: data.data.map((item: Fight) => ({
         ...item,
-        event: backend.jsonToEvent(item.event)
-      }))
+        event: backend.jsonToEvent(item.event),
+      })),
     }
   },
   getFight: async (id: number): Promise<Fight> => {
@@ -163,7 +191,33 @@ export const backend = {
       throw new Error('Failed to fetch events')
     }
     const data: Paginator<Fight> = await response.json()
-    return { ...data, data: data.data.map((item: Fight) => ({ ...item, event: backend.jsonToEvent(item.event)})) }
+    return {
+      ...data,
+      data: data.data.map((item: Fight) => ({
+        ...item,
+        event: backend.jsonToEvent(item.event),
+      })),
+    }
+  },
+  getFighterStreaks: async (id: number): Promise<Streak[]> => {
+    const response: Response = await fetch(
+      `${backend.baseUrl}/api/fighters/${id}/streaks`,
+    )
+    if (response.status !== 200) {
+      throw new Error('Failed to fetch events')
+    }
+    const data: Streak[] = await response.json()
+    return data.map((item) => backend.jsonToStreak(item))
+  },
+  getFighterRecords: async (id: number): Promise<Record[]> => {
+    const response: Response = await fetch(
+      `${backend.baseUrl}/api/fighters/${id}/records`,
+    )
+    if (response.status !== 200) {
+      throw new Error('Failed to fetch events')
+    }
+    const data: Record[] = await response.json()
+    return data.map((item) => backend.jsonToRecord(item))
   },
   getFighters: async (page: number = 0): Promise<Paginator<Fighter>> => {
     const response: Response = await fetch(
