@@ -26,8 +26,9 @@ export const EventDescription: (
 
       <h4>{props.event.fight}</h4>
       {props.showEventName && <h5>{props.event.name}</h5>}
+      <div>{props.event.location}</div>
       <div>
-        {props.event.location} ({props.event.country})
+        {props.event.city.name} - {props.event.city.country.name}
       </div>
       <div>{props.event.date.toLocaleDateString()}</div>
     </div>
