@@ -22,6 +22,7 @@ createRoot(rootElement!).render(
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
+        {window.cordova && <Route path="/index.html" element={<HomePage />} />}
         <Route path="/events/" element={<EventsPage />} />
         <Route path="/fighters/" element={<FightersPage />} />
         <Route path="/events/:id" element={<EventPage />} />
