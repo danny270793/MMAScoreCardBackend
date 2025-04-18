@@ -12,6 +12,8 @@ import {
   Event,
   Fight,
   Fighter,
+  Streak,
+  Record,
 } from '../reducers/backend'
 import { backend, Paginator } from '../services/backend'
 
@@ -33,7 +35,7 @@ export const sagas: ForkEffect[] = [
   ),
 ]
 
-function* onLoadEventsRequest(action: Action) {
+export function* onLoadEventsRequest(action: Action) {
   try {
     const castedAction: LoadEventsRequestAction =
       action as LoadEventsRequestAction
@@ -114,7 +116,24 @@ function* onLoadFighterRequest(action: Action) {
       fights.push(...page.data)
     }
 
-    yield put(backendActions.loadFighterSuccess({ ...fighter, fights: fights }))
+    const streaks: Streak[] = yield call(
+      backend.getFighterStreaks,
+      castedAction.id,
+    )
+
+    const records: Record[] = yield call(
+      backend.getFighterRecords,
+      castedAction.id,
+    )
+
+    yield put(
+      backendActions.loadFighterSuccess({
+        ...fighter,
+        fights,
+        streaks,
+        records,
+      }),
+    )
   } catch (error) {
     yield put(backendActions.loadFighterError(error as Error))
   }

@@ -24,7 +24,9 @@ export const FightDescription: (
           {props.fight.fighter1.name} vs {props.fight.fighter2.name}{' '}
         </h4>
       )}
-      <div>{props.fight.method}</div>
+      <div>
+        {props.fight.method} ({props.fight.method_detail})
+      </div>
       {props.showReferee && props.fight.referee && (
         <div>{props.fight.referee.name}</div>
       )}
@@ -36,8 +38,8 @@ export const FightDescription: (
 
       {props.fight.division && (
         <div>
-          {props.fight.division.weight && `${props.fight.division.weight}lb`}{' '}
-          {props.fight.division.name}
+          {props.fight.division.name} (
+          {props.fight.division.weight && `${props.fight.division.weight}lb`})
         </div>
       )}
 

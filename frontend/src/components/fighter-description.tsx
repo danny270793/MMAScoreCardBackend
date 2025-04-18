@@ -27,7 +27,7 @@ export const FighterDescription: (
         <div>Died: {props.fighter.died.toLocaleDateString()}</div>
       )}
       <div>
-        {props.fighter.city} - {props.fighter.country}
+        {props.fighter.city.name} - {props.fighter.city.country.name}
       </div>
       <div>Birthday: {props.fighter.birthday.toLocaleDateString()}</div>
       <div>Height: {props.fighter.height} cm</div>
