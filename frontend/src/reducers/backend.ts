@@ -12,12 +12,21 @@ export interface Division {
   weight: number
 }
 
+export interface City {
+  name: string
+  country_id: string
+  country: Country
+}
+
+export interface Country {
+  name: string
+}
+
 export interface Fighter {
   id: number
   name: string
   nickname: string | null
-  country: string
-  city: string
+  city: City
   birthday: Date
   died: Date | null
   height: number
@@ -26,6 +35,23 @@ export interface Fighter {
 
 export interface FighterWithFights extends Fighter {
   fights: Fight[]
+  streaks: Streak[]
+  records: Record[]
+}
+
+export interface Streak {
+  id: number
+  result: string
+  counter: number
+  from: Date
+  to: Date
+  fighter_id: string
+}
+
+export interface Record {
+  name: string
+  value: number
+  fighter_id: string
 }
 
 export interface Fight {
@@ -37,6 +63,7 @@ export interface Fight {
   fighter2_result: string
   division: Division
   method: string
+  method_detail: string
   referee: Referee
   round: number
   time: string
@@ -49,7 +76,7 @@ export interface Event {
   name: string
   fight: string
   location: string
-  country: string
+  city: City
   state: string
   date: Date
 }
@@ -187,6 +214,7 @@ export interface BackendState {
   fighters: Paginator<Fighter> | null
   searchedFighters: Paginator<Fighter> | null
   isLoading: boolean
+  isLoadingMore: boolean
   error: Error | null
 }
 
@@ -198,6 +226,7 @@ export const initialState: BackendState = {
   fighters: null,
   searchedFighters: null,
   isLoading: false,
+  isLoadingMore: false,
   error: null,
 }
 
@@ -214,17 +243,25 @@ export const reducer: Reducer = (
     case 'backend/CLEAR_ERROR':
       return { ...state, error: null }
     case 'backend/LOAD_EVENTS_REQUEST':
-      return { ...state, isLoading: true, error: null, events: null }
+      return {
+        ...state,
+        isLoading: true,
+        isLoadingMore: (action as LoadEventsRequestAction).page > 1,
+        error: null,
+        events: null,
+      }
     case 'backend/LOAD_EVENTS_ERROR':
       return {
         ...state,
         isLoading: false,
+        isLoadingMore: false,
         error: (action as LoadEventsErrorAction).error,
       }
     case 'backend/LOAD_EVENTS_SUCCESS':
       return {
         ...state,
         isLoading: false,
+        isLoadingMore: false,
         events: (action as LoadEventsSuccessAction).events,
       }
 
@@ -274,17 +311,25 @@ export const reducer: Reducer = (
       }
 
     case 'backend/LOAD_FIGHTERS_REQUEST':
-      return { ...state, isLoading: true, error: null, fighters: null }
+      return {
+        ...state,
+        isLoading: true,
+        isLoadingMore: (action as LoadFightersRequestAction).page > 1,
+        error: null,
+        fighters: null,
+      }
     case 'backend/LOAD_FIGHTERS_ERROR':
       return {
         ...state,
         isLoading: false,
+        isLoadingMore: false,
         error: (action as LoadFightersErrorAction).error,
       }
     case 'backend/LOAD_FIGHTERS_SUCCESS':
       return {
         ...state,
         isLoading: false,
+        isLoadingMore: false,
         fighters: (action as LoadFightersSuccessAction).fighters,
       }
 
@@ -411,6 +456,7 @@ export interface Store {
 export const selectors = {
   getError: ({ backend }: Store): Error | null => backend.error,
   getIsLoading: ({ backend }: Store): boolean => backend.isLoading,
+  getIsLoadingMore: ({ backend }: Store): boolean => backend.isLoadingMore,
   getEvents: ({ backend }: Store): Paginator<Event> | null => backend.events,
   getEvent: ({ backend }: Store): EventWithFights | null => backend.event,
   getFight: ({ backend }: Store): Fight | null => backend.fight,
