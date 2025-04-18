@@ -15,21 +15,32 @@ import { FightersPage } from './pages/fighters'
 import './styles/index.css'
 import './styles/w3css.css'
 
-const rootElement: HTMLElement | null = document.getElementById('root')
-createRoot(rootElement!).render(
-  // <StrictMode>
-  <Provider store={store}>
-    <Router>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/events/" element={<EventsPage />} />
-        <Route path="/fighters/" element={<FightersPage />} />
-        <Route path="/events/:id" element={<EventPage />} />
-        <Route path="/fight/:id" element={<FightPage />} />
-        <Route path="/fighter/:id" element={<FighterPage />} />
-        <Route path="/*" element={<NotFoundPage />} />
-      </Routes>
-    </Router>
-  </Provider>,
-  // </StrictMode>,
-)
+function startupReact() {
+  const rootElement: HTMLElement | null = document.getElementById('root')
+  createRoot(rootElement!).render(
+    // <StrictMode>
+    <Provider store={store}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          {window.cordova && (
+            <Route path="/index.html" element={<HomePage />} />
+          )}
+          <Route path="/events/" element={<EventsPage />} />
+          <Route path="/fighters/" element={<FightersPage />} />
+          <Route path="/events/:id" element={<EventPage />} />
+          <Route path="/fight/:id" element={<FightPage />} />
+          <Route path="/fighter/:id" element={<FighterPage />} />
+          <Route path="/*" element={<NotFoundPage />} />
+        </Routes>
+      </Router>
+    </Provider>,
+    // </StrictMode>,
+  )
+}
+
+if (!window.cordova) {
+  startupReact()
+} else {
+  document.addEventListener('deviceready', startupReact, false)
+}
