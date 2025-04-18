@@ -45,6 +45,7 @@ export const EventsPage: () => React.ReactElement = () => {
   const error: Error | null = useSelector(backendSelectors.getError)
 
   const isLoading: boolean = useSelector(backendSelectors.getIsLoading)
+  const isLoadingMore: boolean = useSelector(backendSelectors.getIsLoadingMore)
 
   const onLoadMoreClicked: () => void = () => {
     setPage((prevPage: number) => prevPage + 1)
@@ -82,8 +83,8 @@ export const EventsPage: () => React.ReactElement = () => {
             ))}
         </ul>
       </div>
-      {isLoading && <Loader size="small" />}
-      {!isLoading && (
+      {isLoadingMore && <Loader size="small" />}
+      {!isLoadingMore && (
         <button className="w3-button w3-block" onClick={onLoadMoreClicked}>
           Load more
         </button>
