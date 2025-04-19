@@ -10,11 +10,11 @@
 
     "android:build": "cd mobile && npm run build:android",
     "android:start": "cd mobile && npm run start:android",
-    "android": "npm run build:web:mobile && npm run build:android && npm run start:android",
+    "android": "npm run web:build:mobile && npm run android:build && npm run android:start",
     
     "ios:build": "cd mobile && npm run build:ios",
     "ios:start": "cd mobile && npm run start:ios",
-    "ios": "npm run build:web:mobile && npm run build:ios && npm run start:ios"
+    "ios": "npm run web:build:mobile && npm run ios:build && npm run ios:start"
   },
   "keywords": [],
   "author": "",
