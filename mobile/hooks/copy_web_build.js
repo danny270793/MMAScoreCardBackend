@@ -51,7 +51,10 @@ module.exports = function (context) {
 
     const indexFile = path.join(cordovaWWWPath, 'index.html')
     const content = fs.readFileSync(indexFile, 'utf8')
-    const newContent = content.replace('</body>', '</body>\n  <script src="cordova.js"></script>')
+    const newContent = content
+        .replace('</title>', '</title>\n    <script src="cordova.js"></script>')
+        .replace('type="module" crossorigin', '')
+        .replace('rel="stylesheet" crossorigin', 'rel="stylesheet"')
     fs.writeFileSync(indexFile, newContent, 'utf8')
 
     console.log('React dist deployed into cordova')
