@@ -33,6 +33,8 @@ module.exports = function (context) {
         fs.rmSync(cordovaWWWPath, { recursive: true, force: true })
     }
     fs.mkdirSync(cordovaWWWPath, { recursive: true })
+    const gitkeepPath = path.join(reactBuildPath, '.gitkeep')
+    fs.writeFileSync(gitkeepPath, '')
 
     const files = fs.readdirSync(reactBuildPath)
     files.map(file => {
