@@ -1,5 +1,5 @@
 interface Cordova {
-  platformId: string
+  platformId: 'android'|'ios'
 }
 
 declare global {
