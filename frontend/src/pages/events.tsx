@@ -12,6 +12,10 @@ import { EventDescription } from '../components/event-description'
 import { Loader } from '../components/loader'
 import { AppBar } from '../components/appbar'
 import { Modal } from '../components/modal'
+import { List, ListItem } from '../components/list'
+import { Section } from '../components/section'
+import { Button } from '../components/button'
+import { WithLoader } from '../components/with-loader'
 
 export const EventsPage: () => React.ReactElement = () => {
   const navigate: NavigateFunction = useNavigate()
@@ -55,8 +59,11 @@ export const EventsPage: () => React.ReactElement = () => {
     navigate(`/events/${event.id}`)
   }
 
+  const showLoadMoreButton: boolean =
+    events && events.data.length > 0 ? true : false
+
   return (
-    <div>
+    <>
       {error && (
         <Modal
           title="Error"
@@ -67,28 +74,29 @@ export const EventsPage: () => React.ReactElement = () => {
         </Modal>
       )}
       <AppBar title="Events" />
-      {isLoading && <Loader />}
-      <div className="w3-container">
-        <ul className="w3-ul w3-white w3-round w3-hoverable">
-          {allEvents.length === 0 && <li>No events found</li>}
-          {allEvents.length > 0 &&
-            allEvents.map((event: Event) => (
-              <li key={event.id}>
-                <EventDescription
-                  event={event}
-                  showEventName={true}
-                  onSeeMoreClicked={onSeeMoreClicked}
-                />
-              </li>
-            ))}
-        </ul>
-      </div>
-      {isLoadingMore && <Loader size="small" />}
-      {!isLoadingMore && (
-        <button className="w3-button w3-block" onClick={onLoadMoreClicked}>
-          Load more
-        </button>
-      )}
-    </div>
+      <WithLoader isLoading={!isLoadingMore && isLoading}>
+        <>
+          <Section>
+            <List>
+              {allEvents.length === 0 && <ListItem>No events found</ListItem>}
+              {allEvents.length > 0 &&
+                allEvents.map((event: Event) => (
+                  <ListItem key={event.id}>
+                    <EventDescription
+                      event={event}
+                      showEventName={true}
+                      onSeeMoreClicked={onSeeMoreClicked}
+                    />
+                  </ListItem>
+                ))}
+            </List>
+          </Section>
+          {isLoadingMore && <Loader size="small" />}
+          {!isLoadingMore && showLoadMoreButton && (
+            <Button onClick={onLoadMoreClicked}>Load more</Button>
+          )}
+        </>
+      </WithLoader>
+    </>
   )
 }
