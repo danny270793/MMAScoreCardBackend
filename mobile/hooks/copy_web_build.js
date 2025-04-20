@@ -51,12 +51,26 @@ module.exports = function (context) {
 
     copy(reactBuildPath, cordovaWWWPath)
 
+    let VITE_BACKEND_URL = 'http://localhost:8000'
+    const embeddedFile = path.join(context.opts.projectRoot, '..', 'frontend', '.env.embeded')
+    const file = fs.readFileSync(embeddedFile)
+    const lines = file.toString()
+    lines.split('\n').forEach(line => {
+        line = line.trim()
+        const [key, value] = line.split('=')
+        if(key.trim().startsWith('VITE_BACKEND_URL')) {
+            VITE_BACKEND_URL = value.trim()
+        }
+    })
+
+
     const indexFile = path.join(cordovaWWWPath, 'index.html')
     const content = fs.readFileSync(indexFile, 'utf8')
     const newContent = content
         .replace('</title>', '</title>\n    <script src="cordova.js"></script>')
         .replace('type="module" crossorigin', '')
         .replace('rel="stylesheet" crossorigin', 'rel="stylesheet"')
+        .replace(/(<meta[^>]+Content-Security-Policy"[^>]+content="[^"]*?)connect-src\s[^;]+;/, '$1connect-src ' + VITE_BACKEND_URL + ';')
     fs.writeFileSync(indexFile, newContent, 'utf8')
 
     console.log('React dist deployed into cordova')
