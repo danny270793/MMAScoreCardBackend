@@ -10,9 +10,12 @@ import {
 import { NavigateFunction, useNavigate, useParams } from 'react-router-dom'
 import { Modal } from '../components/modal'
 import { AppBar } from '../components/appbar'
-import { Loader } from '../components/loader'
 import { FightDescription } from '../components/fight-description'
 import { FighterDescription } from '../components/fighter-description'
+import { Section } from '../components/section'
+import { WithLoader } from '../components/with-loader'
+import { Card } from '../components/card'
+import { List, ListItem } from '../components/list'
 
 type EventPageParams = {
   id: string | undefined
@@ -39,7 +42,7 @@ export const FightPage: () => React.ReactElement = () => {
   }
 
   return (
-    <div>
+    <>
       {error && (
         <Modal
           title="Error"
@@ -49,64 +52,70 @@ export const FightPage: () => React.ReactElement = () => {
           <pre style={{ overflow: 'auto' }}>{error.stack}</pre>
         </Modal>
       )}
-      {isLoading && <Loader />}
       {fight && (
-        <div>
-          <AppBar title={'Fight'} />
-          <div className="w3-container">
-            <h5>Fight</h5>
-            <div className="w3-container w3-white w3-round">
-              <br />
-              <FightDescription
-                fight={fight}
-                showReferee={true}
-                showFighters={false}
-              />
-              <br />
-            </div>
-            <h5>Fighters</h5>
-            <ul className="w3-ul w3-white w3-round w3-hoverable">
-              {[fight.fighter1, fight.fighter2].map((fighter: Fighter) => (
-                <li key={fighter.id}>
-                  <div className="w3-right">
-                    {fight.fighter1_result === 'win' &&
-                    fight.fighter1.id === fighter.id ? (
-                      <div className="w3-tag w3-green w3-round">WIN</div>
-                    ) : (
-                      ''
-                    )}
-
-                    {fight.fighter2_result === 'win' &&
-                    fight.fighter2.id === fighter.id ? (
-                      <div className="w3-tag w3-green w3-round">WIN</div>
-                    ) : (
-                      ''
-                    )}
-
-                    {fight.fighter1_result === 'loss' &&
-                    fight.fighter1.id === fighter.id ? (
-                      <div className="w3-tag w3-red w3-round">LOSS</div>
-                    ) : (
-                      ''
-                    )}
-
-                    {fight.fighter2_result === 'loss' &&
-                    fight.fighter2.id === fighter.id ? (
-                      <div className="w3-tag w3-red w3-round">LOSS</div>
-                    ) : (
-                      ''
-                    )}
-                  </div>
-                  <FighterDescription
-                    fighter={fighter}
-                    onSeeMoreClicked={() => onSeeMoreClicked(fighter)}
-                  />
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
+        <AppBar title={`${fight.fighter1.name} vs ${fight.fighter2.name}`} />
       )}
-    </div>
+      {!fight && <AppBar title={'Fight'} />}
+      <WithLoader isLoading={isLoading}>
+        <>
+          {fight && (
+            <>
+              <Section>
+                <h5>Fight</h5>
+                <Card>
+                  <br />
+                  <FightDescription
+                    fight={fight}
+                    showReferee={true}
+                    showFighters={false}
+                  />
+                  <br />
+                </Card>
+                <h5>Fighters</h5>
+                <List>
+                  {[fight.fighter1, fight.fighter2].map((fighter: Fighter) => (
+                    <ListItem key={fighter.id}>
+                      <div className="w3-right">
+                        {fight.fighter1_result === 'win' &&
+                        fight.fighter1.id === fighter.id ? (
+                          <div className="w3-tag w3-green w3-round">WIN</div>
+                        ) : (
+                          ''
+                        )}
+
+                        {fight.fighter2_result === 'win' &&
+                        fight.fighter2.id === fighter.id ? (
+                          <div className="w3-tag w3-green w3-round">WIN</div>
+                        ) : (
+                          ''
+                        )}
+
+                        {fight.fighter1_result === 'loss' &&
+                        fight.fighter1.id === fighter.id ? (
+                          <div className="w3-tag w3-red w3-round">LOSS</div>
+                        ) : (
+                          ''
+                        )}
+
+                        {fight.fighter2_result === 'loss' &&
+                        fight.fighter2.id === fighter.id ? (
+                          <div className="w3-tag w3-red w3-round">LOSS</div>
+                        ) : (
+                          ''
+                        )}
+                      </div>
+                      <FighterDescription
+                        fighter={fighter}
+                        onSeeMoreClicked={() => onSeeMoreClicked(fighter)}
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </Section>
+            </>
+          )}
+        </>
+      </WithLoader>
+    </>
   )
 }
