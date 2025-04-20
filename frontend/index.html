@@ -3,15 +3,34 @@
   <head>
     <!-- Universal encoding -->
     <meta charset="UTF-8" />
-    <!-- Protects against injection & allows Cordova schemes -->
+
+    <!--
+      Protects against injection & allows Cordova schemes
+
+      default-src       Load everything else (fonts, frames, etc.) only from self, data URIs, and Cordova's internal gap: scheme.
+      script-src        Allow local scripts + inline scripts (required by many Cordova plugins).
+      style-src         Allow local and inline styles.
+      img-src           Images can come from your app (self) or base64 (data:)
+      connect-src       Allows fetch/XHR/WebSocket requests only to http://localhost:8000 and ws://localhost:8000.
+    -->
     <meta http-equiv="Content-Security-Policy"
-          content="default-src * 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline';
-                    style-src * 'self' 'unsafe-inline';
-                    script-src * 'self' 'unsafe-inline' 'unsafe-eval';
-                    media-src *" />
-    <!-- Responsive, disables zoom -->
+      content="default-src 'self' data: gap:;
+               script-src 'self' 'unsafe-inline' 'unsafe-eval';
+               style-src 'self' 'unsafe-inline';
+               img-src 'self' data:;
+               connect-src http://localhost:8000 ws://localhost:8001;" />
+
+    <!--
+      Responsive, disables zoom
+
+      width=device-width	  Sets the viewport width to match the device's screen width (in CSS pixels). Essential for responsive layouts.
+      initial-scale=1	      Zoom level when the page first loads — 1 means no zoom, show at actual size.
+      maximum-scale=1	      Prevents the user from zooming in beyond the original scale.
+      user-scalable=no	    Disables pinch-to-zoom — used when you want a locked UI, like native apps.
+      viewport-fit=cover	  Tells the browser to use the full screen, even under notches or rounded corners (used with safe-area-inset-* CSS).
+     -->
     <meta name="viewport"
-          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui, viewport-fit=cover" />
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 
     <!-- Prevents mobile UI quirks -->
     <meta name="format-detection" content="telephone=no" />
