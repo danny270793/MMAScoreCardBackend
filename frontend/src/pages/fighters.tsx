@@ -12,6 +12,9 @@ import { Modal } from '../components/modal'
 import { Loader } from '../components/loader'
 import { AppBar } from '../components/appbar'
 import { FighterDescription } from '../components/fighter-description'
+import { Section } from '../components/section'
+import { List, ListItem } from '../components/list'
+import { WithLoader } from '../components/with-loader'
 
 export const FightersPage: () => React.ReactElement = () => {
   const navigate: NavigateFunction = useNavigate()
@@ -101,15 +104,15 @@ export const FightersPage: () => React.ReactElement = () => {
     query === '' ? allFighters : allSearchedFighters
   const showLoadMoreButton: boolean =
     query === ''
-      ? searchedFighters && searchedFighters.data.length > 0
+      ? fighters && fighters.data.length > 0
         ? true
         : false
-      : fighters && fighters.data.length > 0
+      : searchedFighters && searchedFighters.data.length > 0
         ? true
         : false
 
   return (
-    <div>
+    <>
       {error && (
         <Modal
           title="Error"
@@ -119,7 +122,6 @@ export const FightersPage: () => React.ReactElement = () => {
           <pre style={{ overflow: 'auto' }}>{error.stack}</pre>
         </Modal>
       )}
-      {isLoading && <Loader />}
       <AppBar title={'Fighters'} />
       <form onSubmit={onSeachSubmited}>
         <input
@@ -130,26 +132,32 @@ export const FightersPage: () => React.ReactElement = () => {
         />
         <br />
       </form>
-      <div className="w3-container">
-        <ul className="w3-ul w3-white w3-round w3-hoverable">
-          {selectedFighters.length === 0 && <li>No fighters found</li>}
-          {selectedFighters.length > 0 &&
-            selectedFighters.map((fighter: Fighter) => (
-              <li key={fighter.id}>
-                <FighterDescription
-                  fighter={fighter}
-                  onSeeMoreClicked={() => onSeeMoreClicked(fighter)}
-                />
-              </li>
-            ))}
-        </ul>
-      </div>
-      {isLoadingMore && <Loader size="small" />}
-      {!isLoadingMore && showLoadMoreButton && (
-        <button className="w3-button w3-block" onClick={onLoadMoreClicked}>
-          Load more
-        </button>
-      )}
-    </div>
+      <WithLoader isLoading={!isLoadingMore && isLoading}>
+        <>
+          <Section>
+            <List>
+              {selectedFighters.length === 0 && (
+                <ListItem>No fighters found</ListItem>
+              )}
+              {selectedFighters.length > 0 &&
+                selectedFighters.map((fighter: Fighter) => (
+                  <ListItem key={fighter.id}>
+                    <FighterDescription
+                      fighter={fighter}
+                      onSeeMoreClicked={() => onSeeMoreClicked(fighter)}
+                    />
+                  </ListItem>
+                ))}
+            </List>
+          </Section>
+          {isLoadingMore && <Loader size="small" />}
+          {!isLoadingMore && showLoadMoreButton && (
+            <button className="w3-button w3-block" onClick={onLoadMoreClicked}>
+              Load more
+            </button>
+          )}
+        </>
+      </WithLoader>
+    </>
   )
 }
