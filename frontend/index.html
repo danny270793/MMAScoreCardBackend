@@ -1,9 +1,55 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <!-- Universal encoding -->
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+
+    <!--
+      Protects against injection & allows Cordova schemes
+
+      default-src       Load everything else (fonts, frames, etc.) only from self, data URIs, and Cordova's internal gap: scheme.
+      script-src        Allow local scripts + inline scripts (required by many Cordova plugins).
+      style-src         Allow local and inline styles.
+      img-src           Images can come from your app (self) or base64 (data:)
+      connect-src       Allows fetch/XHR/WebSocket requests only to http://localhost:8000 and ws://localhost:8000.
+    -->
+    <meta http-equiv="Content-Security-Policy"
+      content="default-src 'self' data: gap:;
+               script-src 'self' 'unsafe-inline' 'unsafe-eval';
+               style-src 'self' 'unsafe-inline';
+               img-src 'self' data:;
+               connect-src %VITE_BACKEND_URL% ws://localhost:8001;" />
+
+    <!--
+      Responsive, disables zoom
+
+      width=device-width	  Sets the viewport width to match the device's screen width (in CSS pixels). Essential for responsive layouts.
+      initial-scale=1	      Zoom level when the page first loads — 1 means no zoom, show at actual size.
+      maximum-scale=1	      Prevents the user from zooming in beyond the original scale.
+      user-scalable=no	    Disables pinch-to-zoom — used when you want a locked UI, like native apps.
+      viewport-fit=cover	  Tells the browser to use the full screen, even under notches or rounded corners (used with safe-area-inset-* CSS).
+     -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+
+    <!-- Prevents mobile UI quirks -->
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+
+    <!-- Disables cache -->
+    <meta http-equiv="Expires" content="0">
+    <meta http-equiv="Last-Modified" content="0">
+    <meta http-equiv="Cache-Control" content="no-cache, mustrevalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+
+    <!-- Disable translations -->
+    <meta http-equiv="content-language" content="es">
+    <meta name="google" content="notranslate" />
+
+    <!-- android address bar color -->
+    <meta name="theme-color" content="rgb(33, 150, 243)">
+
+    <link rel="icon" type="image/png" href="/icon.png" />
     <title>UFC Events</title>
   </head>
   <body>

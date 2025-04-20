@@ -57,6 +57,7 @@ module.exports = function (context) {
         .replace('</title>', '</title>\n    <script src="cordova.js"></script>')
         .replace('type="module" crossorigin', '')
         .replace('rel="stylesheet" crossorigin', 'rel="stylesheet"')
+        .replace('ws://localhost:8001;', '')
     fs.writeFileSync(indexFile, newContent, 'utf8')
 
     console.log('React dist deployed into cordova')
