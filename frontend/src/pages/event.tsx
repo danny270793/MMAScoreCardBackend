@@ -9,11 +9,14 @@ import {
 } from '../reducers/backend'
 import { NavigateFunction, useNavigate, useParams } from 'react-router-dom'
 import { Modal } from '../components/modal'
-import { Loader } from '../components/loader'
 import { AppBar } from '../components/appbar'
 import { BottomBar } from '../components/bottombar'
 import { EventDescription } from '../components/event-description'
 import { FightDescription } from '../components/fight-description'
+import { WithLoader } from '../components/with-loader'
+import { Section } from '../components/section'
+import { List, ListItem } from '../components/list'
+import { Card } from '../components/card'
 
 type EventPageParams = {
   id: string | undefined
@@ -40,7 +43,7 @@ export const EventPage: () => React.ReactElement = () => {
   }
 
   return (
-    <div>
+    <>
       {error && (
         <Modal
           title="Error"
@@ -50,40 +53,40 @@ export const EventPage: () => React.ReactElement = () => {
           <pre style={{ overflow: 'auto' }}>{error.stack}</pre>
         </Modal>
       )}
-      {isLoading && <Loader />}
-      {event && (
-        <div>
-          <AppBar title={event.name} />
-          <div className="w3-container">
-            <h5>Event</h5>
-            <div className="w3-container w3-white w3-round">
-              <EventDescription event={event} showEventName={false} />
-              <br />
-            </div>
+      {event && <AppBar title={event.name} />}
+      {!event && <AppBar title={'Event'} />}
+      <WithLoader isLoading={isLoading}>
+        <>
+          {event && (
+            <Section>
+              <h5>Event</h5>
+              <Card>
+                <EventDescription event={event!} showEventName={false} />
+                <br />
+              </Card>
 
-            <h5>Fights</h5>
-            <ul className="w3-ul w3-white w3-round w3-hoverable">
-              {event.fights.length === 0 && <li>No fights found</li>}
-              {event.fights.length > 0 &&
-                event.fights.map((fight: Fight) => (
-                  <li key={fight.id}>
-                    <FightDescription
-                      fight={fight}
-                      onSeeMoreClicked={() => onSeeMoreClicked(fight)}
-                      showReferee={false}
-                      showFighters={true}
-                    />
-                  </li>
-                ))}
-            </ul>
-          </div>
-        </div>
-      )}
-      {event && (
-        <BottomBar>
-          <div className="w3-center">{event.fights.length} fights</div>
-        </BottomBar>
-      )}
-    </div>
+              <h5>Fights</h5>
+              <List>
+                {event.fights.length === 0 && (
+                  <ListItem>No fights found</ListItem>
+                )}
+                {event.fights.length > 0 &&
+                  event.fights.map((fight: Fight) => (
+                    <ListItem key={fight.id}>
+                      <FightDescription
+                        fight={fight}
+                        onSeeMoreClicked={() => onSeeMoreClicked(fight)}
+                        showReferee={false}
+                        showFighters={true}
+                      />
+                    </ListItem>
+                  ))}
+              </List>
+            </Section>
+          )}
+        </>
+      </WithLoader>
+      <BottomBar>{event?.fights.length ?? 0} fights</BottomBar>
+    </>
   )
 }
