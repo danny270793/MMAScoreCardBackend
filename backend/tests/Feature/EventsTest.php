@@ -35,7 +35,7 @@ class EventsTest extends TestCase
                     'name',
                     'fight',
                     'location',
-                    'country',
+                    'city',
                     'date',
                 ],
             ],
