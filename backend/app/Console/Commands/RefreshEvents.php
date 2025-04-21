@@ -42,9 +42,9 @@ class RefreshEvents extends Command
         $this->info('Getting recods');
         Record::truncate();
 
-        $this->withProgressBar(Fighter::all(), function ($fighter) {
+        $this->withProgressBar(Fighter::all(), function ($fighter): void {
             $fights = Fight::where('state', 'finished')
-                ->where(function ($query) use ($fighter) {
+                ->where(function ($query) use ($fighter): void {
                     $query->where('fighter1_id', $fighter['id'])
                         ->orWhere('fighter2_id', $fighter['id']);
                 })
@@ -85,7 +85,7 @@ class RefreshEvents extends Command
 
             $octagonSeconds = 0;
             foreach ($fights as $fight) {
-                $parts = explode(':', $fight->time);
+                $parts = explode(':', (string) $fight->time);
                 $octagonSeconds += (int) $parts[0] * 60 + (int) $parts[1];
             }
             Record::create(['name' => 'octagon time', 'value' => $octagonSeconds, 'fighter_id' => $fighter['id']]);
@@ -99,7 +99,7 @@ class RefreshEvents extends Command
             foreach ($fights as $fight) {
                 if ($fight->fighter1_id === $fighter->id) {
                     if ($fight->fighter1_result === 'win') {
-                        switch (strtolower($fight->method_detail)) {
+                        switch (strtolower((string) $fight->method_detail)) {
                             case 'ko':
                             case 'tko':
                                 $kos += 1;
@@ -184,9 +184,9 @@ class RefreshEvents extends Command
         $this->info('Getting stats');
         Streak::truncate();
 
-        $this->withProgressBar(Fighter::all(), function ($fighter) use ($sherdog) {
+        $this->withProgressBar(Fighter::all(), function ($fighter) use ($sherdog): void {
             $fights = Fight::where('fights.state', 'finished')
-                ->where(function ($query) use ($fighter) {
+                ->where(function ($query) use ($fighter): void {
                     $query->where('fighter1_id', $fighter['id'])
                         ->orWhere('fighter2_id', $fighter['id']);
                 })
@@ -212,7 +212,7 @@ class RefreshEvents extends Command
     private function createCities(Sherdog $sherdog, Cache $cache, $force)
     {
         $this->info('Getting countries');
-        $sherdog->executeOnEachCity($force, function ($eachCountry) {
+        $sherdog->executeOnEachCity($force, function ($eachCountry): void {
             $country = Country::where('name', $eachCountry['country'])->first();
             if ($country === null) {
                 $country = new Country;
@@ -229,7 +229,7 @@ class RefreshEvents extends Command
             $city->country_id = $country->id;
             $city->save();
         });
-        $this->withProgressBar(Country::all(), function ($country) {});
+        $this->withProgressBar(Country::all(), function ($country): void {});
         $this->newLine();
         $this->comment(Country::count().' countries on database');
         $this->comment(City::count().' cities on database');
@@ -258,7 +258,7 @@ class RefreshEvents extends Command
         // }
 
         $this->info('Getting events');
-        $sherdog->executeOnEachEvent(function ($eachEvent) use ($cache) {
+        $sherdog->executeOnEachEvent(function ($eachEvent) use ($cache): void {
             $country = Country::where('name', $eachEvent['country'])->first();
             $city = City::where('name', $eachEvent['city'])->where('country_id', $country->id)->first();
 
@@ -281,7 +281,7 @@ class RefreshEvents extends Command
             $event->state = $eachEvent['state'];
             $event->save();
         });
-        $this->withProgressBar(Event::all(), function ($event) {});
+        $this->withProgressBar(Event::all(), function ($event): void {});
         $this->newLine();
         $this->comment(Event::count().' events on database');
     }
@@ -304,8 +304,8 @@ class RefreshEvents extends Command
         // }
 
         $this->info('Getting referees');
-        $this->withProgressBar(Event::all(), function ($event) use ($sherdog) {
-            $sherdog->executeOnEachRefereeFromEvent($event, function ($eachReferee) {
+        $this->withProgressBar(Event::all(), function ($event) use ($sherdog): void {
+            $sherdog->executeOnEachRefereeFromEvent($event, function ($eachReferee): void {
                 $referee = Referee::where('name', $eachReferee['name'])->first();
                 if ($referee === null) {
                     $referee = new Referee;
@@ -337,8 +337,8 @@ class RefreshEvents extends Command
         // }
 
         $this->info('Getting divisions');
-        $this->withProgressBar(Event::all(), function ($event, $bar) use ($sherdog) {
-            $sherdog->executeOnEachDivisionsFromEvent($event, function ($eachDivision) {
+        $this->withProgressBar(Event::all(), function ($event, $bar) use ($sherdog): void {
+            $sherdog->executeOnEachDivisionsFromEvent($event, function ($eachDivision): void {
                 $division = Division::where('name', $eachDivision['name'])->first();
                 if ($division === null) {
                     $division = new Division;
@@ -378,8 +378,8 @@ class RefreshEvents extends Command
         // }
 
         $this->info('Getting fighters');
-        $this->withProgressBar(Event::all(), function ($event) use ($sherdog) {
-            $sherdog->executeOnEachFightersFromEvent($event, function ($eachFighter) {
+        $this->withProgressBar(Event::all(), function ($event) use ($sherdog): void {
+            $sherdog->executeOnEachFightersFromEvent($event, function ($eachFighter): void {
                 $country = Country::where('name', $eachFighter['country'])->first();
                 if ($country === null) {
                     $country = new Country;
@@ -455,8 +455,8 @@ class RefreshEvents extends Command
         // }
 
         $this->info('Getting fights');
-        $this->withProgressBar(Event::all(), function ($event) use ($sherdog) {
-            $sherdog->executeOnEachFightsFromEvent($event, function ($eachFight) {
+        $this->withProgressBar(Event::all(), function ($event) use ($sherdog): void {
+            $sherdog->executeOnEachFightsFromEvent($event, function ($eachFight): void {
                 $event = Event::where('name', $eachFight['event'])->first();
                 $fighter1 = Fighter::where('name', $eachFight['fighter1'])->first();
                 $fighter2 = Fighter::where('name', $eachFight['fighter2'])->first();
