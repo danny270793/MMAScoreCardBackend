@@ -6,7 +6,3 @@ export default defineConfig(({ mode }) => ({
   base: mode === 'embeded' ? './' : '/',
   plugins: [react()],
 }))
-
-// export default defineConfig({
-//   plugins: [react()],
-// })
