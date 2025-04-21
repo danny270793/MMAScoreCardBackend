@@ -36,19 +36,6 @@ module.exports = function (context) {
     const gitkeepPath = path.join(reactBuildPath, '.gitkeep')
     fs.writeFileSync(gitkeepPath, '')
 
-    const files = fs.readdirSync(reactBuildPath)
-    files.map(file => {
-        const fileFullPath = path.join(reactBuildPath, file)
-        const stats = fs.statSync(fileFullPath)
-        if(stats.isFile()) {
-            const destPath = path.join(cordovaWWWPath, file)
-            fs.copyFileSync(fileFullPath, destPath)
-        } else if (stats.isDirectory()) {
-
-        }
-        console.log(fileFullPath)
-    })
-
     copy(reactBuildPath, cordovaWWWPath)
 
     const indexFile = path.join(cordovaWWWPath, 'index.html')
@@ -59,6 +46,20 @@ module.exports = function (context) {
         .replace('rel="stylesheet" crossorigin', 'rel="stylesheet"')
         .replace('ws://localhost:8001;', '')
     fs.writeFileSync(indexFile, newContent, 'utf8')
+
+    const assetsPath = path.join(cordovaWWWPath, 'assets')
+    fs.readdirSync(assetsPath).map((file) => {
+        const fileFullPath = path.join(assetsPath, file)
+        if(fileFullPath.endsWith('.js')) {
+            const content = fs.readFileSync(fileFullPath, 'utf8')
+
+            const newContent = content
+                .replace(/import.meta.url/g, 'window.location.href')
+                .replace(/new URL\("/g, 'new URL("assets/')
+                
+            fs.writeFileSync(fileFullPath, newContent, 'utf8')
+        }
+    })
 
     console.log('React dist deployed into cordova')
 }
