@@ -19,18 +19,20 @@
   "license": "Apache-2.0",
   "cordova": {
     "platforms": [
-      "android",
       "ios",
-      "electron"
+      "electron",
+      "android"
     ],
     "plugins": {
-      "cordova-plugin-statusbar": {}
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-device": {}
     }
   },
   "devDependencies": {
     "cordova-android": "^13.0.0",
     "cordova-electron": "^4.0.0",
     "cordova-ios": "^7.1.1",
+    "cordova-plugin-device": "^3.0.0",
     "cordova-plugin-statusbar": "^4.0.0",
     "cordova-res": "^0.15.4"
   }
