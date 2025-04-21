@@ -8,15 +8,15 @@
 
     "android:build": "cd mobile && npm run build:android",
     "android:start": "cd mobile && npm run start:android",
-    "android": "npm run web:build -- -- --mode=embeded && npm run android:build && npm run android:start",
+    "android": "npm run web:build -- -- --mode=embeded --minify=false && npm run android:build && npm run android:start",
     
     "ios:build": "cd mobile && npm run build:ios",
     "ios:start": "cd mobile && npm run start:ios",
-    "ios": "npm run web:build -- -- --mode=embeded && npm run ios:build && npm run ios:start",
+    "ios": "npm run web:build -- -- --mode=embeded --minify=false && npm run ios:build && npm run ios:start",
 
     "desktop:build": "cd mobile && npm run build:desktop",
     "desktop:start": "cd mobile && npm run start:desktop",
-    "desktop": "npm run web:build -- -- --mode=embeded && npm run desktop:build && npm run desktop:start"
+    "desktop": "npm run web:build -- -- --mode=embeded --minify=false && npm run desktop:build && npm run desktop:start"
   },
   "keywords": [],
   "author": "",
