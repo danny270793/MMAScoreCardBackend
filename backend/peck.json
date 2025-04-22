@@ -3,7 +3,8 @@
     "ignore": {
         "words": [
             "php",
-            "sherdog"
+            "sherdog",
+            "paginator"
         ],
         "paths": []
     }
