@@ -7,15 +7,13 @@ use App\Models\Fighter;
 use App\Models\Record;
 use App\Models\Streak;
 use App\Services\Sherdog;
+use App\Http\Requests\FighterSearchRequest;
 use Illuminate\Http\Request;
 
 class FightersController extends Controller
 {
-    private $sherdog;
-
-    public function __construct(Sherdog $sherdog)
+    public function __construct(private readonly Sherdog $sherdog)
     {
-        $this->sherdog = $sherdog;
     }
 
     public function index()
@@ -47,7 +45,7 @@ class FightersController extends Controller
             ->json($fights);
     }
 
-    public function search(Request $request)
+    public function search(FighterSearchRequest $request)
     {
         $query = $request->input('query');
         $fighters = Fighter::with('city')

@@ -3,7 +3,13 @@
     "ignore": {
         "words": [
             "php",
-            "sherdog"
+            "sherdog",
+            "paginator",
+            "favicon",
+            "dockerfile",
+            "js",
+            "filesystems",
+            "utils"
         ],
         "paths": []
     }

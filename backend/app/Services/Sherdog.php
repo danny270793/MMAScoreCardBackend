@@ -12,13 +12,10 @@ use Illuminate\Support\Facades\Log;
 
 class Sherdog
 {
-    private $cache;
+    private string $baseUrl = 'https://www.sherdog.com';
 
-    private $baseUrl = 'https://www.sherdog.com';
-
-    public function __construct(Cache $cache)
+    public function __construct(private readonly Cache $cache)
     {
-        $this->cache = $cache;
     }
 
     public function getFightStatsFromFighter($fights, $fighter)
@@ -114,7 +111,7 @@ class Sherdog
                 $link = $columns->item(1)->getElementsByTagName('a')->item(0)->getAttribute('href');
 
                 $fightTitle = trim($columns->item(1)->textContent);
-                if (strpos($fightTitle, 'vs') !== false) {
+                if (str_contains($fightTitle, 'vs')) {
                     $phrases = explode('-', $fightTitle);
                     $eventName = trim($phrases[0]);
                     $mainFight = trim($phrases[1]);
@@ -255,7 +252,7 @@ class Sherdog
         $page = 1;
         while ($pageHasEvents) {
             $refreshPage = $forceRefresh && $page === 1;
-            $pageEvents = $this->executeOnEachEventFromPage($page, function ($eachEvent) use ($callback) {
+            $pageEvents = $this->executeOnEachEventFromPage($page, function ($eachEvent) use ($callback): void {
                 $country = [
                     'country' => $eachEvent['country'],
                     'city' => $eachEvent['city'],
@@ -296,8 +293,8 @@ class Sherdog
 
             $spans = $column->getElementsByTagName('span');
             foreach ($spans as $span) {
-                if (strpos($span->getAttribute('class'), 'final_result') !== false) {
-                    $fighterResult = trim($span->textContent);
+                if (str_contains((string) $span->getAttribute('class'), 'final_result')) {
+                    $fighterResult = trim((string) $span->textContent);
                 }
             }
 
@@ -351,7 +348,7 @@ class Sherdog
 
                 $spans = $div->getElementsByTagName('span');
                 foreach ($spans as $span) {
-                    if (strpos($span->getAttribute('class'), 'final_result') !== false) {
+                    if (str_contains($span->getAttribute('class'), 'final_result')) {
                         $fighter1Result = strtolower(trim($span->textContent));
                     }
                 }
@@ -368,7 +365,7 @@ class Sherdog
 
                 $spans = $div->getElementsByTagName('span');
                 foreach ($spans as $span) {
-                    if (strpos($span->getAttribute('class'), 'final_result') !== false) {
+                    if (str_contains($span->getAttribute('class'), 'final_result')) {
                         $fighter2Result = strtolower(trim($span->textContent));
                     }
                 }
@@ -414,15 +411,15 @@ class Sherdog
         }
 
         $divisionName = trim(str_replace("\n", '', $divisionName));
-        if (strpos($divisionName, 'TITLE FIGHT') !== false) {
+        if (str_contains($divisionName, 'TITLE FIGHT')) {
             $divisionName = str_replace('TITLE FIGHT', '', $divisionName);
-        } elseif (strpos($divisionName, 'lb') !== false) {
+        } elseif (str_contains($divisionName, 'lb')) {
             $parts = explode('lb', $divisionName);
             $divisionName = end($parts);
         }
         $divisionName = trim($divisionName);
 
-        $parts = explode('(', $method);
+        $parts = explode('(', (string) $method);
         $method = trim($parts[0]);
         $rest = array_slice($parts, 1);
         $methodDetail = rtrim(trim(implode('(', $rest)), ')');
@@ -508,15 +505,15 @@ class Sherdog
                     throw new \Exception('Unexpected number of columns: '.$columns->length);
                 }
 
-                if (strpos($divisionName, 'TITLE FIGHT') !== false) {
+                if (str_contains($divisionName, 'TITLE FIGHT')) {
                     $divisionName = str_replace('TITLE FIGHT', '', $divisionName);
-                } elseif (strpos($divisionName, 'lb') !== false) {
+                } elseif (str_contains($divisionName, 'lb')) {
                     $parts = explode('lb', $divisionName);
                     $divisionName = end($parts);
                 }
                 $divisionName = trim($divisionName);
 
-                $parts = explode('(', $method);
+                $parts = explode('(', (string) $method);
                 $method = trim($parts[0]);
                 $rest = array_slice($parts, 1);
                 $methodDetail = rtrim(trim(implode('(', $rest)), ')');
@@ -735,7 +732,7 @@ class Sherdog
 
     public function executeOnEachRefereeFromEvent($event, $callback)
     {
-        $this->executeOnEachFightsDataFromEvent($event, function ($fight) use ($callback) {
+        $this->executeOnEachFightsDataFromEvent($event, function ($fight) use ($callback): void {
             if ($fight['referee'] === null) {
                 return;
             }
@@ -780,38 +777,29 @@ class Sherdog
 
     public function executeOnEachReferee($callback)
     {
-        $this->executeOnEachEvent(function ($event) use ($callback) {
+        $this->executeOnEachEvent(function ($event) use ($callback): void {
             $this->executeOnEachRefereeFromEvent($event, $callback);
         });
     }
 
     public function executeOnEachDivisionsFromEvent($event, $callback)
     {
-        $this->executeOnEachFightsDataFromEvent($event, function ($data) use ($callback) {
+        $this->executeOnEachFightsDataFromEvent($event, function ($data) use ($callback): void {
             if ($data['division'] === '') {
                 return;
             }
 
-            switch (strtoupper($data['division'])) {
-                case 'FLYWEIGHT': $divisionWeight = 125;
-                    break;
-                case 'BANTAMWEIGHT': $divisionWeight = 135;
-                    break;
-                case 'FEATHERWEIGHT': $divisionWeight = 145;
-                    break;
-                case 'LIGHTWEIGHT': $divisionWeight = 155;
-                    break;
-                case 'WELTERWEIGHT': $divisionWeight = 170;
-                    break;
-                case 'MIDDLEWEIGHT': $divisionWeight = 185;
-                    break;
-                case 'LIGHT HEAVYWEIGHT': $divisionWeight = 205;
-                    break;
-                case 'HEAVYWEIGHT': $divisionWeight = 225;
-                    break;
-                default: $divisionWeight = null;
-                    break;
-            }
+            $divisionWeight = match (strtoupper((string) $data['division'])) {
+                'FLYWEIGHT' => 125,
+                'BANTAMWEIGHT' => 135,
+                'FEATHERWEIGHT' => 145,
+                'LIGHTWEIGHT' => 155,
+                'WELTERWEIGHT' => 170,
+                'MIDDLEWEIGHT' => 185,
+                'LIGHT HEAVYWEIGHT' => 205,
+                'HEAVYWEIGHT' => 225,
+                default => null,
+            };
 
             $division = [
                 'name' => $data['division'],
@@ -877,13 +865,26 @@ class Sherdog
 
     public function executeOnEachDivision($callback)
     {
-        $this->executeOnEachEvent(function ($event) use ($callback) {
+        $this->executeOnEachEvent(function ($event) use ($callback): void {
             $this->executeOnEachDivisionsFromEvent($event, $callback);
         });
     }
 
     public function getFightersDetails($fighter)
     {
+        if($fighter['name'] === 'Unknown Fighter')
+        {
+            return [
+                'nickname' => null,
+                'country' => 'NO COUNTRY',
+                'city' => 'NO CITY',
+                'birthday' => Carbon::now(),
+                'died' => null,
+                'height' => 0,
+                'weight' => 0,
+            ];
+        }
+        
         $html = $this->getHtml($fighter['link']);
 
         $dom = new \DOMDocument;
@@ -962,7 +963,7 @@ class Sherdog
 
     public function executeOnEachFightersFromEvent($event, $callback)
     {
-        $this->executeOnEachFightsDataFromEvent($event, function ($fight) use ($callback) {
+        $this->executeOnEachFightsDataFromEvent($event, function ($fight) use ($callback): void {
             $fighter1 = [
                 'name' => $fight['fighter1Name'],
                 'link' => $fight['fighter1Link'],
@@ -1042,7 +1043,7 @@ class Sherdog
 
     public function executeOnEachFighter($callback)
     {
-        $this->executeOnEachEvent(function ($event) use ($callback) {
+        $this->executeOnEachEvent(function ($event) use ($callback): void {
             $this->executeOnEachFightersFromEvent($event, $callback);
         });
     }
@@ -1066,7 +1067,7 @@ class Sherdog
 
     public function executeOnEachFightsFromEvent($event, $callback)
     {
-        $this->executeOnEachFightsDataFromEvent($event, function ($fight) use ($event, $callback) {
+        $this->executeOnEachFightsDataFromEvent($event, function ($fight) use ($event, $callback): void {
             $fight = [
                 'position' => $fight['position'],
                 'event' => $event['name'],
@@ -1129,7 +1130,7 @@ class Sherdog
 
     public function executeOnEachFight($callback)
     {
-        $this->executeOnEachEvent(function ($event) use ($callback) {
+        $this->executeOnEachEvent(function ($event) use ($callback): void {
             $this->executeOnEachFightsFromEvent($event, $callback);
         });
     }
