@@ -4,7 +4,12 @@
         "words": [
             "php",
             "sherdog",
-            "paginator"
+            "paginator",
+            "favicon",
+            "dockerfile",
+            "js",
+            "filesystems",
+            "utils"
         ],
         "paths": []
     }
