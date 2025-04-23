@@ -2,3 +2,29 @@ body {
   color: #000 !important;
   background-color: #f1f1f1 !important;
 }
+
+.center-vertically {
+  display: flex;
+  align-items: center;
+}
+
+/* small */
+@media (max-width: 600px) {
+  .icon-mobile {
+    max-width: 70px;
+  }
+}
+
+/* medium */
+@media (max-width: 992px) and (min-width: 601px) {
+  .icon-mobile {
+    max-width: 100px;
+  }
+}
+
+/* large */
+@media (min-width: 993px) {
+  .icon-mobile {
+    max-width: 100px;
+  }
+}
