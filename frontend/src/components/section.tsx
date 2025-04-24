@@ -5,5 +5,5 @@ export interface SectionProps {
 }
 
 export const Section = (props: SectionProps): React.ReactElement => {
-  return <div className="w3-container">{props.children}</div>
+  return <div className="w3-padding">{props.children}</div>
 }
