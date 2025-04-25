@@ -85,7 +85,19 @@ export interface EventWithFights extends Event {
   fights: Fight[]
 }
 
+export interface Device {
+  id: number
+  name: string
+  current: boolean
+  platform_id: string
+  platform: string
+  model: string
+  version: string
+  last_used_at: Date|null
+}
+
 export type Type =
+  | 'backend/INIT'
   | 'backend/CLEAR_ERROR'
   | 'backend/LOAD_EVENTS_REQUEST'
   | 'backend/LOAD_EVENTS_SUCCESS'
@@ -105,9 +117,25 @@ export type Type =
   | 'backend/SEARCH_FIGHTERS_REQUEST'
   | 'backend/SEARCH_FIGHTERS_SUCCESS'
   | 'backend/SEARCH_FIGHTERS_ERROR'
+  | 'backend/GET_DEVICES_REQUESTED'
+  | 'backend/GET_DEVICES_SUCCESS'
+  | 'backend/GET_DEVICES_ERROR'
+  | 'backend/DELETE_DEVICE_REQUESTED'
+  | 'backend/DELETE_DEVICE_SUCCESS'
+  | 'backend/DELETE_DEVICE_ERROR'
+  | 'backend/GET_DEVICE_REQUESTED'
+  | 'backend/GET_DEVICE_SUCCESS'
+  | 'backend/GET_DEVICE_ERROR'
+  | 'backend/UPDATE_DEVICE_REQUESTED'
+  | 'backend/UPDATE_DEVICE_SUCCESS'
+  | 'backend/UPDATE_DEVICE_ERROR'
 
 export interface Action extends UnknownAction {
   type: Type
+}
+
+export interface InitAction extends Action {
+  type: 'backend/INIT'
 }
 
 export interface ClearErrorAction extends Action {
@@ -206,6 +234,65 @@ export interface SearchFightersErrorAction extends Action {
   error: Error
 }
 
+export interface GetDevicesRequestedAction extends Action {
+  type: 'backend/GET_DEVICES_REQUESTED'
+}
+
+export interface GetDevicesSuccessAction extends Action {
+  type: 'backend/GET_DEVICES_SUCCESS'
+  devices: Device[]
+}
+
+export interface GetDevicesErrorAction extends Action {
+  type: 'backend/GET_DEVICES_ERROR'
+  error: Error
+}
+
+export interface DeleteDeviceRequestedAction extends Action {
+  type: 'backend/DELETE_DEVICE_REQUESTED'
+  id: number
+}
+
+export interface DeleteDeviceSuccessAction extends Action {
+  type: 'backend/DELETE_DEVICE_SUCCESS'
+}
+
+export interface DeleteDeviceErrorAction extends Action {
+  type: 'backend/DELETE_DEVICE_ERROR'
+  error: Error
+}
+
+export interface GetDeviceRequestedAction extends Action {
+  type: 'backend/GET_DEVICE_REQUESTED'
+  id: number
+}
+
+export interface GetDeviceSuccessAction extends Action {
+  type: 'backend/GET_DEVICE_SUCCESS'
+  device: Device
+}
+
+export interface GetDeviceErrorAction extends Action {
+  type: 'backend/GET_DEVICE_ERROR'
+  error: Error
+}
+
+export interface UpdateDeviceRequestedAction extends Action {
+  type: 'backend/UPDATE_DEVICE_REQUESTED'
+  id: number
+  name: string
+}
+
+export interface UpdateDeviceSuccessAction extends Action {
+  type: 'backend/UPDATE_DEVICE_SUCCESS'
+  device: Device
+}
+
+export interface UpdateDeviceErrorAction extends Action {
+  type: 'backend/UPDATE_DEVICE_ERROR'
+  error: Error
+}
+
 export interface BackendState {
   events: Paginator<Event> | null
   event: EventWithFights | null
@@ -216,6 +303,8 @@ export interface BackendState {
   isLoading: boolean
   isLoadingMore: boolean
   error: Error | null
+  devices: Device[]
+  device: Device | null
 }
 
 export const initialState: BackendState = {
@@ -228,10 +317,12 @@ export const initialState: BackendState = {
   isLoading: false,
   isLoadingMore: false,
   error: null,
+  devices: [],
+  device: null
 }
 
 type Reducer = (
-  state: BackendState | undefined,
+  state: BackendState,
   action: UnknownAction,
 ) => BackendState
 
@@ -239,7 +330,9 @@ export const reducer: Reducer = (
   state = initialState,
   action: UnknownAction,
 ): BackendState => {
-  switch (action.type) {
+  switch ((action as Action).type) {
+    case 'backend/INIT':
+      return initialState
     case 'backend/CLEAR_ERROR':
       return { ...state, error: null }
     case 'backend/LOAD_EVENTS_REQUEST':
@@ -349,12 +442,89 @@ export const reducer: Reducer = (
           .searchedFighters,
       }
 
+    case 'backend/GET_DEVICES_REQUESTED':
+      return {
+        ...state,
+        isLoading: true,
+        devices: [],
+      }
+    case 'backend/GET_DEVICES_SUCCESS':
+      return {
+        ...state,
+        isLoading: false,
+        devices: (action as GetDevicesSuccessAction).devices,
+      }
+    case 'backend/GET_DEVICES_ERROR':
+      return {
+        ...state,
+        isLoading: false,
+        error: (action as GetDevicesErrorAction).error,
+      }
+
+    case 'backend/DELETE_DEVICE_REQUESTED':
+      return {
+        ...state,
+        isLoading: true,
+      }
+    case 'backend/DELETE_DEVICE_SUCCESS':
+      return {
+        ...state,
+        isLoading: false
+      }
+    case 'backend/DELETE_DEVICE_ERROR':
+      return {
+        ...state,
+        isLoading: false,
+        error: (action as GetDevicesErrorAction).error,
+      }
+    
+    case 'backend/GET_DEVICE_REQUESTED':
+      return {
+        ...state,
+        isLoading: true,
+        device: null
+      }
+    case 'backend/GET_DEVICE_SUCCESS':
+      return {
+        ...state,
+        isLoading: false,
+        device: (action as GetDeviceSuccessAction).device,
+      }
+    case 'backend/GET_DEVICE_ERROR':
+      return {
+        ...state,
+        isLoading: false,
+        error: (action as GetDeviceErrorAction).error,
+      }
+
+    case 'backend/UPDATE_DEVICE_REQUESTED':
+      return {
+        ...state,
+        isLoading: true,
+      }
+    case 'backend/UPDATE_DEVICE_SUCCESS':
+      return {
+        ...state,
+        isLoading: false,
+        device: (action as UpdateDeviceSuccessAction).device,
+      }
+    case 'backend/UPDATE_DEVICE_ERROR':
+      return {
+        ...state,
+        isLoading: false,
+        error: (action as UpdateDeviceErrorAction).error,
+      }
+
     default:
       return state
   }
 }
 
 export const actions = {
+  init: (): InitAction => ({
+    type: 'backend/INIT'
+  }),
+
   clearError: (): ClearErrorAction => ({
     type: 'backend/CLEAR_ERROR',
     error: null,
@@ -447,6 +617,57 @@ export const actions = {
     type: 'backend/SEARCH_FIGHTERS_ERROR',
     error,
   }),
+
+  getDevices: (): GetDevicesRequestedAction => ({
+    type: 'backend/GET_DEVICES_REQUESTED',
+  }),
+  getDevicesSuccess: (devices: Device[]): GetDevicesSuccessAction => ({
+    type: 'backend/GET_DEVICES_SUCCESS',
+    devices
+  }),
+  getDevicesError: (error: Error): GetDevicesErrorAction => ({
+    type: 'backend/GET_DEVICES_ERROR',
+    error,
+  }),
+
+  deleteDevice: (id: number): DeleteDeviceRequestedAction => ({
+    type: 'backend/DELETE_DEVICE_REQUESTED',
+    id
+  }),
+  deleteDeviceSuccess: (): DeleteDeviceSuccessAction => ({
+    type: 'backend/DELETE_DEVICE_SUCCESS',
+  }),
+  deleteDeviceError: (error: Error): DeleteDeviceErrorAction => ({
+    type: 'backend/DELETE_DEVICE_ERROR',
+    error,
+  }),
+
+  getDevice: (id: number): GetDeviceRequestedAction => ({
+    type: 'backend/GET_DEVICE_REQUESTED',
+    id
+  }),
+  getDeviceSuccess: (device: Device): GetDeviceSuccessAction => ({
+    type: 'backend/GET_DEVICE_SUCCESS',
+    device
+  }),
+  getDeviceError: (error: Error): GetDeviceErrorAction => ({
+    type: 'backend/GET_DEVICE_ERROR',
+    error,
+  }),
+
+  updateDevice: (id: number, name: string): UpdateDeviceRequestedAction => ({
+    type: 'backend/UPDATE_DEVICE_REQUESTED',
+    id,
+    name
+  }),
+  updateDeviceSuccess: (device: Device): UpdateDeviceSuccessAction => ({
+    type: 'backend/UPDATE_DEVICE_SUCCESS',
+    device
+  }),
+  updateDeviceError: (error: Error): UpdateDeviceErrorAction => ({
+    type: 'backend/UPDATE_DEVICE_ERROR',
+    error,
+  }),
 }
 
 export interface Store {
@@ -465,4 +686,6 @@ export const selectors = {
     backend.fighters,
   getSearchedFighters: ({ backend }: Store): Paginator<Fighter> | null =>
     backend.searchedFighters,
+  getDevices: ({ backend }: Store): Device[] => backend.devices,
+  getDevice: ({ backend }: Store): Device | null => backend.device,
 }
