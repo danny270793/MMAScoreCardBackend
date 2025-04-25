@@ -3,7 +3,7 @@ import { Loader } from './loader'
 
 export interface WithLoaderProps {
   isLoading: boolean
-  children: React.ReactElement
+  children: React.ReactElement | React.ReactElement[] | null
 }
 
 export const WithLoader = (props: WithLoaderProps): React.ReactElement => {

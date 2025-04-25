@@ -1,9 +1,21 @@
 import React from 'react'
 
 export interface CardProps {
+  padding?: boolean
   children: React.ReactNode
 }
 
-export const Card = (props: CardProps): React.ReactElement => {
-  return <div className="w3-container w3-white w3-round">{props.children}</div>
+export const Card = ({
+  padding = true,
+  children,
+}: CardProps): React.ReactElement => {
+  return (
+    <div
+      className={['w3-white', 'w3-round', padding ? 'w3-padding' : ''].join(
+        ' ',
+      )}
+    >
+      {children}
+    </div>
+  )
 }

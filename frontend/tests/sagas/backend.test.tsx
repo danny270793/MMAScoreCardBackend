@@ -7,6 +7,7 @@ import {
 } from '../../src/reducers/backend'
 import { call, put } from 'redux-saga/effects'
 import { backend, Paginator } from '../../src/services/backend'
+import { redirectIfUnauthorized } from '../../src/sagas/session'
 
 describe('backend sagas', () => {
   it('check that onLoadEventsRequest executes successfully', () => {
@@ -35,8 +36,10 @@ describe('backend sagas', () => {
     // check that next yield is a put to loadEventsError
     const error: Error = new Error('Failed to fetch events')
     expect(generator.throw(error).value).toEqual(
-      put(actions.loadEventsError(error)),
+      call(redirectIfUnauthorized, error),
     )
+
+    expect(generator.next().value).toEqual(put(actions.loadEventsError(error)))
 
     // check that sagas is done
     expect(generator.next().done).toBe(true)

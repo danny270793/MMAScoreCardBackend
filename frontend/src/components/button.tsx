@@ -2,13 +2,29 @@ import React from 'react'
 
 export interface ButtonProps {
   children: React.ReactNode
-  onClick: () => void
+  className?: string
+  type?: 'error' | 'info' | 'warning' | 'success'
+  onClick?: () => void
 }
 
-export const Button = (props: ButtonProps): React.ReactElement => {
+export const Button = ({
+  children,
+  className = '',
+  type = 'info',
+  onClick = undefined,
+}: ButtonProps): React.ReactElement => {
   return (
-    <button className="w3-button w3-block" onClick={props.onClick}>
-      {props.children}
+    <button
+      className={[
+        'w3-button',
+        className,
+        type === 'error' && 'w3-red',
+        type === 'warning' && 'w3-orange',
+        type === 'success' && 'w3-green',
+      ].join(' ')}
+      onClick={onClick}
+    >
+      {children}
     </button>
   )
 }
