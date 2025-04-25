@@ -1,3 +1,5 @@
+import { store } from "../reducers/index";
+
 export interface Link {
   url: string
   label: string
@@ -94,6 +96,35 @@ export interface Fight {
   state: string
 }
 
+export interface Device {
+  id: string
+  name: string
+  platform: string
+  current: boolean
+  model: string
+  version: string
+  last_used_at: Date|null
+}
+
+export interface ApiError {
+  message: string,
+  errors: {[key: string]: string[]}
+}
+
+export class UnauthorizedClientError extends Error {}
+
+export class ForbiddenResourceError extends Error {}
+
+export class ApiValidationError extends Error {
+  errors: {[key: string]: string[]}
+
+  constructor(error: ApiError) {
+    super(error.message)
+
+    this.errors = error.errors
+  }
+}
+
 export const backend = {
   baseUrl: import.meta.env.VITE_BACKEND_URL,
   jsonToEvent: (item: Event): Event => ({
@@ -113,10 +144,97 @@ export const backend = {
   jsonToRecord: (item: Record): Record => ({
     ...item,
   }),
-  getEvents: async (page: number = 0): Promise<Paginator<Event>> => {
+  jsonToDevice: (item: Device): Device => ({
+    ...item,
+    current: item.current === true ? true : false,
+    last_used_at: item.last_used_at ? new Date(item.last_used_at) : null,
+  }),
+  validateResponse: async (response: Response): Promise<Response> => {
+    if (response.status === 401) {
+      throw new UnauthorizedClientError()
+    } else if (response.status === 403) {
+      throw new ForbiddenResourceError()
+    } else if (response.status === 422) {
+      const payload: ApiError = await response.json()
+      throw new ApiValidationError(payload)
+    }
+
+    return response
+  },
+  fetch: async (url: string, options: RequestInit|null = null) => {
+    const token: string|null = store.getState().session.token
+
     const response: Response = await fetch(
-      `${backend.baseUrl}/api/events?page=${page}`,
+      url,
+      {
+        ...options,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        }
+      }
     )
+
+    return backend.validateResponse(response)
+  },
+  fetchAnonymous: async (url: string, options: RequestInit|null = null) => {
+    const response: Response = await fetch(
+      url,
+      {
+        ...options,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        }
+      }
+    )
+
+    return backend.validateResponse(response)
+  },
+  login: async (email: string, password: string, model: string, platformId: string, platform: string, version: string): Promise<string> => {
+    const body: string = JSON.stringify({
+      email,
+      password,
+      model,
+      platform_id: platformId,
+      platform,
+      version
+    });
+
+    const response: Response = await backend.fetchAnonymous(
+      `${backend.baseUrl}/api/auth/login`,
+      {
+        method: 'POST',
+        body
+      }
+    )
+    if (response.status !== 200) {
+      throw new Error('Failed to fetch events')
+    }
+
+    return await response.text()
+  },
+  logout: async (token: string): Promise<string> => {
+    const body: string = JSON.stringify({
+      token
+    });
+
+    const response: Response = await backend.fetch(
+      `${backend.baseUrl}/api/auth/logout`,
+      {
+        method: 'POST',
+        body
+      }
+    )
+    if (response.status !== 200) {
+      throw new Error('Failed to fetch events')
+    }
+    return response.text()
+  },
+  getEvents: async (page: number = 0): Promise<Paginator<Event>> => {
+    const response: Response = await backend.fetch(
+      `${backend.baseUrl}/api/events?page=${page}`)
     if (response.status !== 200) {
       throw new Error('Failed to fetch events')
     }
@@ -126,8 +244,52 @@ export const backend = {
       data: data.data.map((item: Event) => backend.jsonToEvent(item)),
     }
   },
+  getDevices: async (): Promise<Device[]> => {
+    const response: Response = await backend.fetch(
+      `${backend.baseUrl}/api/users/devices`)
+    if (response.status !== 200) {
+      throw new Error('Failed to fetch devices')
+    }
+    const devices: Device[] = await response.json()
+    return devices.map((item: Device) => backend.jsonToDevice(item))
+  },
+  getDevice: async (id: number): Promise<Device> => {
+    const response: Response = await backend.fetch(
+      `${backend.baseUrl}/api/users/devices/${id}`)
+    if (response.status !== 200) {
+      throw new Error('Failed to get devices')
+    }
+
+    const device: Device = await response.json()
+    return backend.jsonToDevice(device)
+  },
+  updateDevice: async (id: number, name: string): Promise<Device> => {
+    const body: string = JSON.stringify({
+      name
+    });
+
+    const response: Response = await backend.fetch(
+      `${backend.baseUrl}/api/users/devices/${id}`, {
+        method: 'post',
+        body
+      })
+    if (response.status !== 200) {
+      throw new Error('Failed to update device')
+    }
+
+    const device: Device = await response.json()
+    return backend.jsonToDevice(device)
+  },
+  deleteDevice: async (id: number): Promise<void> => {
+    const response: Response = await backend.fetch(
+      `${backend.baseUrl}/api/users/devices/${id}`,
+    { method: 'delete'})
+    if (response.status !== 200) {
+      throw new Error('Failed to delete device')
+    }
+  },
   getEvent: async (id: number): Promise<Event> => {
-    const response: Response = await fetch(
+    const response: Response = await backend.fetch(
       `${backend.baseUrl}/api/events/${id}`,
     )
     if (response.status !== 200) {
@@ -140,11 +302,11 @@ export const backend = {
     id: number,
     page: number = 1,
   ): Promise<Paginator<Fight>> => {
-    const response: Response = await fetch(
+    const response: Response = await backend.fetch(
       `${backend.baseUrl}/api/events/${id}/fights?page=${page}`,
     )
     if (response.status !== 200) {
-      throw new Error('Failed to fetch events')
+      throw new Error('Failed to fetch event')
     }
     const data: Paginator<Fight> = await response.json()
     return {
@@ -156,11 +318,11 @@ export const backend = {
     }
   },
   getFight: async (id: number): Promise<Fight> => {
-    const response: Response = await fetch(
+    const response: Response = await backend.fetch(
       `${backend.baseUrl}/api/fights/${id}`,
     )
     if (response.status !== 200) {
-      throw new Error('Failed to fetch events')
+      throw new Error('Failed to fetch fight')
     }
     const data: Fight = await response.json()
     return {
@@ -171,11 +333,11 @@ export const backend = {
     }
   },
   getFighter: async (id: number): Promise<Fighter> => {
-    const response: Response = await fetch(
+    const response: Response = await backend.fetch(
       `${backend.baseUrl}/api/fighters/${id}`,
     )
     if (response.status !== 200) {
-      throw new Error('Failed to fetch events')
+      throw new Error('Failed to fetch fighter')
     }
     const data: Fighter = await response.json()
     return backend.jsonToFighter(data)
@@ -184,11 +346,11 @@ export const backend = {
     id: number,
     page: number = 1,
   ): Promise<Paginator<Fight>> => {
-    const response: Response = await fetch(
+    const response: Response = await backend.fetch(
       `${backend.baseUrl}/api/fighters/${id}/fights?page=${page}`,
     )
     if (response.status !== 200) {
-      throw new Error('Failed to fetch events')
+      throw new Error('Failed to fetch fighter fights')
     }
     const data: Paginator<Fight> = await response.json()
     return {
@@ -200,31 +362,31 @@ export const backend = {
     }
   },
   getFighterStreaks: async (id: number): Promise<Streak[]> => {
-    const response: Response = await fetch(
+    const response: Response = await backend.fetch(
       `${backend.baseUrl}/api/fighters/${id}/streaks`,
     )
     if (response.status !== 200) {
-      throw new Error('Failed to fetch events')
+      throw new Error('Failed to fetch fighter streaks')
     }
     const data: Streak[] = await response.json()
     return data.map((item) => backend.jsonToStreak(item))
   },
   getFighterRecords: async (id: number): Promise<Record[]> => {
-    const response: Response = await fetch(
+    const response: Response = await backend.fetch(
       `${backend.baseUrl}/api/fighters/${id}/records`,
     )
     if (response.status !== 200) {
-      throw new Error('Failed to fetch events')
+      throw new Error('Failed to fetch fighter records')
     }
     const data: Record[] = await response.json()
     return data.map((item) => backend.jsonToRecord(item))
   },
   getFighters: async (page: number = 0): Promise<Paginator<Fighter>> => {
-    const response: Response = await fetch(
+    const response: Response = await backend.fetch(
       `${backend.baseUrl}/api/fighters?page=${page}`,
     )
     if (response.status !== 200) {
-      throw new Error('Failed to fetch events')
+      throw new Error('Failed to fetch fighters')
     }
     const data: Paginator<Fighter> = await response.json()
     return {
@@ -236,11 +398,11 @@ export const backend = {
     page: number,
     query: string,
   ): Promise<Paginator<Fighter>> => {
-    const response: Response = await fetch(
+    const response: Response = await backend.fetch(
       `${backend.baseUrl}/api/fighters/search?query=${query}&page=${page}`,
     )
     if (response.status !== 200) {
-      throw new Error('Failed to fetch events')
+      throw new Error('Failed to search fighters')
     }
     const data: Paginator<Fighter> = await response.json()
     return {
