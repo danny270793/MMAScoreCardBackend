@@ -16,9 +16,14 @@ interface Device {
   sdkVersion?: string
 }
 
+interface StatusBar {
+  backgroundColorByHexString: (color: string) => void
+}
+
 declare global {
   interface Window {
     cordova: Cordova | undefined
+    StatusBar: StatusBar | undefined
     device: Device | undefined
   }
 }
