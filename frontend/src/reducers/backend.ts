@@ -1,5 +1,5 @@
 import { UnknownAction } from '@reduxjs/toolkit'
-import { Paginator } from '../services/backend'
+import { Paginator } from '../services/backend/models'
 
 export interface Referee {
   id: number
