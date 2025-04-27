@@ -93,7 +93,7 @@ export interface Device {
   platform: string
   model: string
   version: string
-  last_used_at: Date|null
+  last_used_at: Date | null
 }
 
 export type Type =
@@ -318,13 +318,10 @@ export const initialState: BackendState = {
   isLoadingMore: false,
   error: null,
   devices: [],
-  device: null
+  device: null,
 }
 
-type Reducer = (
-  state: BackendState,
-  action: UnknownAction,
-) => BackendState
+type Reducer = (state: BackendState, action: UnknownAction) => BackendState
 
 export const reducer: Reducer = (
   state = initialState,
@@ -469,7 +466,7 @@ export const reducer: Reducer = (
     case 'backend/DELETE_DEVICE_SUCCESS':
       return {
         ...state,
-        isLoading: false
+        isLoading: false,
       }
     case 'backend/DELETE_DEVICE_ERROR':
       return {
@@ -477,12 +474,12 @@ export const reducer: Reducer = (
         isLoading: false,
         error: (action as GetDevicesErrorAction).error,
       }
-    
+
     case 'backend/GET_DEVICE_REQUESTED':
       return {
         ...state,
         isLoading: true,
-        device: null
+        device: null,
       }
     case 'backend/GET_DEVICE_SUCCESS':
       return {
@@ -522,7 +519,7 @@ export const reducer: Reducer = (
 
 export const actions = {
   init: (): InitAction => ({
-    type: 'backend/INIT'
+    type: 'backend/INIT',
   }),
 
   clearError: (): ClearErrorAction => ({
@@ -623,7 +620,7 @@ export const actions = {
   }),
   getDevicesSuccess: (devices: Device[]): GetDevicesSuccessAction => ({
     type: 'backend/GET_DEVICES_SUCCESS',
-    devices
+    devices,
   }),
   getDevicesError: (error: Error): GetDevicesErrorAction => ({
     type: 'backend/GET_DEVICES_ERROR',
@@ -632,7 +629,7 @@ export const actions = {
 
   deleteDevice: (id: number): DeleteDeviceRequestedAction => ({
     type: 'backend/DELETE_DEVICE_REQUESTED',
-    id
+    id,
   }),
   deleteDeviceSuccess: (): DeleteDeviceSuccessAction => ({
     type: 'backend/DELETE_DEVICE_SUCCESS',
@@ -644,11 +641,11 @@ export const actions = {
 
   getDevice: (id: number): GetDeviceRequestedAction => ({
     type: 'backend/GET_DEVICE_REQUESTED',
-    id
+    id,
   }),
   getDeviceSuccess: (device: Device): GetDeviceSuccessAction => ({
     type: 'backend/GET_DEVICE_SUCCESS',
-    device
+    device,
   }),
   getDeviceError: (error: Error): GetDeviceErrorAction => ({
     type: 'backend/GET_DEVICE_ERROR',
@@ -658,11 +655,11 @@ export const actions = {
   updateDevice: (id: number, name: string): UpdateDeviceRequestedAction => ({
     type: 'backend/UPDATE_DEVICE_REQUESTED',
     id,
-    name
+    name,
   }),
   updateDeviceSuccess: (device: Device): UpdateDeviceSuccessAction => ({
     type: 'backend/UPDATE_DEVICE_SUCCESS',
-    device
+    device,
   }),
   updateDeviceError: (error: Error): UpdateDeviceErrorAction => ({
     type: 'backend/UPDATE_DEVICE_ERROR',
