@@ -6,19 +6,18 @@ import {
   LoginRequestedAction,
   LogoutRequestedAction,
 } from '../reducers/session'
-import {
-  actions as backendActions,
-} from '../reducers/session'
-import { backend, UnauthorizedClientError } from '../services/backend'
+import { actions as backendActions } from '../reducers/session'
+import { backend } from '../services/backend'
 import { DeviceInfo, getDeviceInfo } from '../utils/device'
+import { UnauthorizedClientError } from '../services/http/errors'
 
 export const sagas: ForkEffect[] = [
   takeLatest<SessionTypes>('session/LOGIN_REQUESTED', onLoginRequested),
-  takeLatest<SessionTypes>('session/LOGOUT_REQUESTED', onLogoutRequest)  
+  takeLatest<SessionTypes>('session/LOGOUT_REQUESTED', onLogoutRequest),
 ]
 
 export function* redirectIfUnauthorized(error: unknown) {
-  if(error instanceof UnauthorizedClientError) {
+  if (error instanceof UnauthorizedClientError) {
     yield put(sessionActions.init())
     yield put(backendActions.init())
     yield put(sessionActions.logoutSuccess())
@@ -27,8 +26,7 @@ export function* redirectIfUnauthorized(error: unknown) {
 
 export function* onLoginRequested(action: Action) {
   try {
-    const castedAction: LoginRequestedAction =
-      action as LoginRequestedAction
+    const castedAction: LoginRequestedAction = action as LoginRequestedAction
 
     const device: DeviceInfo = getDeviceInfo()
 
@@ -39,7 +37,7 @@ export function* onLoginRequested(action: Action) {
       device.model,
       device.platformId,
       device.platform,
-      device.version
+      device.version,
     )
     yield put(sessionActions.loginSuccess(token))
   } catch (error) {
@@ -49,8 +47,7 @@ export function* onLoginRequested(action: Action) {
 
 export function* onLogoutRequest(action: Action) {
   try {
-    const castedAction: LogoutRequestedAction =
-      action as LogoutRequestedAction
+    const castedAction: LogoutRequestedAction = action as LogoutRequestedAction
     yield call(backend.logout, castedAction.token)
     yield put(sessionActions.logoutSuccess())
   } catch (error) {
