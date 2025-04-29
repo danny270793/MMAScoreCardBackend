@@ -17,7 +17,7 @@ export const Modal: (props: ModalProps) => React.ReactElement = ({
     <div className="w3-modal" style={{ display: 'block' }}>
       <div
         className={[
-          'w3-modal-content w3-animate-zoom',
+          'w3-modal-content w3-animate-top primary-color',
           type === 'error' && 'w3-red',
           type === 'warning' && 'w3-orange',
           type === 'success' && 'w3-green',
