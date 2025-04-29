@@ -11,9 +11,11 @@ export const Card = ({
 }: CardProps): React.ReactElement => {
   return (
     <div
-      className={['w3-white', 'w3-round', padding ? 'w3-padding' : ''].join(
-        ' ',
-      )}
+      className={[
+        'primary-light-color',
+        'w3-round',
+        padding ? 'w3-padding' : '',
+      ].join(' ')}
     >
       {children}
     </div>
