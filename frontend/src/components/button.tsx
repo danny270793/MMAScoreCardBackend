@@ -21,6 +21,7 @@ export const Button = ({
         type === 'error' && 'w3-red',
         type === 'warning' && 'w3-orange',
         type === 'success' && 'w3-green',
+        type === 'info' && 'main-color',
       ].join(' ')}
       onClick={onClick}
     >
