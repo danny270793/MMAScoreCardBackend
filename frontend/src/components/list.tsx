@@ -13,7 +13,7 @@ export const List = ({
     <ul
       className={[
         'w3-ul',
-        'w3-white',
+        'primary-light-color',
         'w3-round',
         clickeable ? 'w3-hoverable' : '',
       ].join(' ')}
@@ -24,17 +24,17 @@ export const List = ({
 }
 
 export interface ListItemProps {
-  removePadding?: boolean
+  padding?: boolean
   onClick?: (() => void) | undefined
   children: React.ReactNode
 }
 
 export const ListItem = ({
-  removePadding = false,
+  padding = true,
   onClick = undefined,
   children,
 }: ListItemProps): React.ReactElement => {
-  if (removePadding) {
+  if (!padding) {
     return (
       <li onClick={onClick} style={{ padding: '0px' }}>
         {children}
