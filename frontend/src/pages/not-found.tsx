@@ -1,17 +1,24 @@
 import React from 'react'
-import { NavigateFunction, useNavigate } from 'react-router-dom'
+import { Button } from '../components/button'
+import { NavigateTo, useNavigateTo } from '../hooks/use-navigate-to'
+import { useTranslation } from 'react-i18next'
 
 export const NotFoundPage: () => React.ReactElement = () => {
-  const navigate: NavigateFunction = useNavigate()
+  const { t } = useTranslation()
+  const navigateTo: NavigateTo = useNavigateTo()
 
   const onGoToHomeClicked: () => void = () => {
-    navigate(`/events`)
+    navigateTo.home()
   }
 
   return (
-    <div>
-      <h1>The page you&apos;re looking for was not found</h1>
-      <button onClick={onGoToHomeClicked}>Go to home</button>
+    <div className="w3-display-container" style={{ height: '100vh' }}>
+      <div className="w3-display-middle w3-center">
+        <h1>{t('pageNotFound', { postProcess: 'capitalize' })}</h1>
+        <Button type="info" onClick={onGoToHomeClicked}>
+          {t('goToHome', { postProcess: 'capitalize' })}
+        </Button>
+      </div>
     </div>
   )
 }
