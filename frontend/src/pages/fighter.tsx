@@ -10,7 +10,6 @@ import {
   Record,
 } from '../reducers/backend'
 import { useParams } from 'react-router-dom'
-import { Modal } from '../components/modal'
 import { AppBar } from '../components/appbar'
 import { FighterDescription } from '../components/fighter-description'
 import { BottomBar } from '../components/bottombar'
@@ -19,12 +18,15 @@ import { WithLoader } from '../components/with-loader'
 import { List, ListItem } from '../components/list'
 import { Card } from '../components/card'
 import { Section } from '../components/section'
+import { ErrorModal } from '../components/error-modal'
+import { useTranslation } from 'react-i18next'
 
 type EventPageParams = {
   id: string | undefined
 }
 
 export const FighterPage: () => React.ReactElement = () => {
+  const { t } = useTranslation()
   const { id } = useParams<EventPageParams>()
 
   const dispatch: Dispatch = useDispatch()
@@ -94,117 +96,137 @@ export const FighterPage: () => React.ReactElement = () => {
 
   const getFightTag = (result: string) => {
     if ('win' === result) {
-      return <div className="w3-tag w3-green w3-round">WIN</div>
+      return (
+        <div className="w3-tag w3-green w3-round">
+          {t('win', { postProcess: 'upper' })}
+        </div>
+      )
     } else if ('loss' === result) {
-      return <div className="w3-tag w3-red w3-round">LOSS</div>
+      return (
+        <div className="w3-tag w3-red w3-round">
+          {t('loss', { postProcess: 'upper' })}
+        </div>
+      )
     } else if ('draw' === result) {
-      return <div className="w3-tag w3-yellow w3-round">DRAW</div>
+      return (
+        <div className="w3-tag w3-yellow w3-round">
+          {t('draw', { postProcess: 'upper' })}
+        </div>
+      )
     } else if ('nc' === result) {
-      return <div className="w3-tag w3-organge w3-round">NC</div>
+      return (
+        <div className="w3-tag w3-organge w3-round">
+          {t('nc', { postProcess: 'upper' })}
+        </div>
+      )
     }
   }
 
   return (
     <>
-      {error && (
-        <Modal
-          title="Error"
-          onClose={() => dispatch(backendActions.clearError())}
-        >
-          <p>{error.message}</p>
-          <pre style={{ overflow: 'auto' }}>{error.stack}</pre>
-        </Modal>
-      )}
-      {fighter && <AppBar title={fighter.name} />}
-      {!fighter && <AppBar title={'Fighter'} />}
+      <ErrorModal
+        error={error}
+        onClose={() => dispatch(backendActions.clearError())}
+      />
+      <AppBar title={fighter ? fighter.name : 'Fighter'} />
       <WithLoader isLoading={isLoading}>
-        <>
-          {fighter && (
-            <>
-              <Section>
-                <h5>Fighter</h5>
-                <Card>
-                  <FighterDescription fighter={fighter} />
-                  <br />
-                </Card>
+        {fighter && (
+          <Section>
+            <h5>{t('fighter', { postProcess: 'capitalize' })}</h5>
+            <Card>
+              <FighterDescription fighter={fighter} />
+              <br />
+            </Card>
 
-                <h5>Stats</h5>
-                <Card>
-                  <br />
-                  <div>
-                    Record:{' '}
-                    {
-                      fighter.records.filter(
-                        (record: Record) => record.name === 'wins',
-                      )[0].value
-                    }
-                    -
-                    {
-                      fighter.records.filter(
-                        (record: Record) => record.name === 'losses',
-                      )[0].value
-                    }
-                    -
-                    {
-                      fighter.records.filter(
-                        (record: Record) => record.name === 'ncs',
-                      )[0].value
-                    }{' '}
-                    {
-                      fighter.records.filter(
-                        (record: Record) => record.name === 'draws',
-                      )[0].value
-                    }
-                  </div>
-                  <div>Current streak: {computeCurrentStreak(fighter)}</div>
-                  <div>Beast streak: {computeBestStreak(fighter)}</div>
-                  <div>Worst streak: {computeWorstStreak(fighter)}</div>
-                  <div>
-                    Octagon time:{' '}
-                    {secondsToHHMMSS(
-                      fighter.records.filter(
-                        (record: Record) => record.name === 'octagon time',
-                      )[0].value,
-                    )}
-                  </div>
-                  <br />
-                </Card>
+            <h5>{t('stats', { postProcess: 'capitalize' })}</h5>
+            <Card>
+              <br />
+              <div>
+                {t('record', { postProcess: 'capitalize' })}:{' '}
+                {
+                  fighter.records.filter(
+                    (record: Record) => record.name === 'wins',
+                  )[0].value
+                }
+                -
+                {
+                  fighter.records.filter(
+                    (record: Record) => record.name === 'losses',
+                  )[0].value
+                }
+                -
+                {
+                  fighter.records.filter(
+                    (record: Record) => record.name === 'ncs',
+                  )[0].value
+                }{' '}
+                {
+                  fighter.records.filter(
+                    (record: Record) => record.name === 'draws',
+                  )[0].value
+                }
+              </div>
+              <div>
+                {t('currentStreak', { postProcess: 'capitalize' })}:{' '}
+                {computeCurrentStreak(fighter)}
+              </div>
+              <div>
+                {t('bestStreak', { postProcess: 'capitalize' })}:{' '}
+                {computeBestStreak(fighter)}
+              </div>
+              <div>
+                {t('worstStreak', { postProcess: 'capitalize' })}:{' '}
+                {computeWorstStreak(fighter)}
+              </div>
+              <div>
+                {t('octagonTime', { postProcess: 'capitalize' })}:{' '}
+                {secondsToHHMMSS(
+                  fighter.records.filter(
+                    (record: Record) => record.name === 'octagon time',
+                  )[0].value,
+                )}
+              </div>
+              <br />
+            </Card>
 
-                <h5>Fights</h5>
-                <List>
-                  {fighter.fights.length === 0 && (
-                    <ListItem>No fights found</ListItem>
-                  )}
-                  {fighter.fights.length > 0 &&
-                    fighter.fights.map((fight: Fight) => (
-                      <ListItem key={fight.id}>
-                        <div className="w3-right">
-                          {fight.fighter2.id === fighter.id &&
-                            getFightTag(fight.fighter2_result)}
+            <h5>{t('fights', { postProcess: 'capitalize' })}</h5>
+            <List>
+              {fighter.fights.length === 0 && (
+                <ListItem>
+                  {t('fightsNotFound', { postProcess: 'capitalize' })}
+                </ListItem>
+              )}
+              {fighter.fights.length > 0 &&
+                fighter.fights.map((fight: Fight) => (
+                  <ListItem key={fight.id}>
+                    <div className="w3-right">
+                      {fight.fighter2.id === fighter.id &&
+                        getFightTag(fight.fighter2_result)}
 
-                          {fight.fighter1.id === fighter.id &&
-                            getFightTag(fight.fighter1_result)}
-                        </div>
-                        <h4>
-                          {fight.fighter2.id === fighter.id &&
-                            fight.fighter1.name}
-                          {fight.fighter1.id === fighter.id &&
-                            fight.fighter2.name}
-                        </h4>
-                        <FightDescription
-                          fight={fight}
-                          showReferee={true}
-                          showFighters={false}
-                        />
-                      </ListItem>
-                    ))}
-                </List>
-              </Section>
-            </>
-          )}
-        </>
+                      {fight.fighter1.id === fighter.id &&
+                        getFightTag(fight.fighter1_result)}
+                    </div>
+                    <h4>
+                      {fight.fighter2.id === fighter.id && fight.fighter1.name}
+                      {fight.fighter1.id === fighter.id && fight.fighter2.name}
+                    </h4>
+                    <FightDescription
+                      fight={fight}
+                      showReferee={true}
+                      showFighters={false}
+                    />
+                  </ListItem>
+                ))}
+            </List>
+          </Section>
+        )}
       </WithLoader>
-      <BottomBar>{fighter?.fights.length ?? 0} fights</BottomBar>
+      <BottomBar>
+        {fighter?.fights.length ?? 0}{' '}
+        {fighter?.fights.length === 1
+          ? t('fight', { postProcess: 'capitalize' })
+          : t('fights', { postProcess: 'capitalize' })}
+      </BottomBar>
     </>
   )
 }
