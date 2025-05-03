@@ -6,6 +6,9 @@ import pluginReact from 'eslint-plugin-react'
 
 export default defineConfig([
   {
+    ignores: ['node_modules/', 'dist/'],
+  },
+  {
     files: ['**/*.{js,mjs,cjs,ts,jsx,tsx}'],
     plugins: { js },
     extends: ['js/recommended'],
