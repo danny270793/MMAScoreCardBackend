@@ -1,6 +1,58 @@
+:root {
+  --accent-background-color: #2196f3;
+  --accent-text-color: #ffffff;
+  --primary-background-color: #f1f1f1;
+  --primary-text-color: #000000;
+  --primary-light-background-color: #ffffff;
+  --primary-light-text-color: #000000;
+  --modal-background-color: rgba(0, 0, 0, 0.4);
+}
+
+[data-theme='dark'] {
+  --accent-background-color: #2b2a2a;
+  --accent-text-color: #ffffff;
+  --primary-background-color: #141313;
+  --primary-text-color: #ffffff;
+  --primary-light-background-color: #303030;
+  --primary-light-text-color: #ffffff;
+  --modal-background-color: rgba(255, 255, 255, 0.4);
+}
+
+[data-theme='light'] {
+  --accent-background-color: #2196f3;
+  --accent-text-color: #ffffff;
+  --primary-background-color: #f1f1f1;
+  --primary-text-color: #000000;
+  --primary-light-background-color: #ffffff;
+  --primary-light-text-color: #000000;
+  --modal-background-color: rgba(0, 0, 0, 0.4);
+}
+
 body {
-  color: #000 !important;
-  background-color: #f1f1f1 !important;
+  background-color: var(--primary-background-color) !important;
+  color: var(--primary-text-color) !important;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.w3-modal {
+  background-color: var(--modal-background-color) !important;
+}
+
+.primary-color {
+  background-color: var(--primary-background-color) !important;
+  color: var(--primary-text-color) !important;
+}
+
+.accent-color {
+  background-color: var(--accent-background-color) !important;
+  color: var(--accent-text-color) !important;
+}
+
+.primary-light-color {
+  background-color: var(--primary-light-background-color) !important;
+  color: var(--primary-light-text-color) !important;
 }
 
 .center-vertically {

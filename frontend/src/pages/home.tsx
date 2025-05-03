@@ -1,18 +1,55 @@
 import React from 'react'
-import { NavigateFunction, useNavigate } from 'react-router-dom'
 import { AppBar } from '../components/appbar'
+import { List, ListItem } from '../components/list'
+import { Section } from '../components/section'
+import { useDispatch, useSelector } from 'react-redux'
+import { Dispatch } from '@reduxjs/toolkit'
+import {
+  selectors as sessionSelectors,
+  actions as sessionActions,
+} from '../reducers/session'
+import { useTranslation } from 'react-i18next'
+import { ErrorModal } from '../components/error-modal'
+import { NavigateTo, useNavigateTo } from '../hooks/use-navigate-to'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faGear } from '@fortawesome/free-solid-svg-icons'
 
 export const HomePage: () => React.ReactElement = () => {
-  const navigate: NavigateFunction = useNavigate()
+  const { t } = useTranslation()
+  const navigateTo: NavigateTo = useNavigateTo()
+  const dispatch: Dispatch = useDispatch()
+
+  const error: Error | null = useSelector(sessionSelectors.getError)
+
   return (
-    <div>
-      <AppBar title={'MMA Scorecard'} />
-      <div className="w3-container">
-        <ul className="w3-ul w3-white w3-round w3-hoverable">
-          <li onClick={() => navigate('/events')}>Events</li>
-          <li onClick={() => navigate('/fighters')}>Fighters</li>
-        </ul>
-      </div>
-    </div>
+    <>
+      <ErrorModal
+        error={error}
+        onClose={() => dispatch(sessionActions.clearError())}
+      />
+      <AppBar
+        title={t('appName')}
+        actions={[
+          {
+            children: <FontAwesomeIcon icon={faGear} />,
+            onClick: () => navigateTo.settings(),
+            showIf: true,
+          },
+        ]}
+      />
+      <Section className="w3-animate-right">
+        <List>
+          <ListItem onClick={() => navigateTo.events()}>
+            {t('events', { postProcess: 'capitalize' })}
+          </ListItem>
+          <ListItem onClick={() => navigateTo.fighters()}>
+            {t('fighters', { postProcess: 'capitalize' })}
+          </ListItem>
+          <ListItem onClick={() => navigateTo.devices()}>
+            {t('devices', { postProcess: 'capitalize' })}
+          </ListItem>
+        </List>
+      </Section>
+    </>
   )
 }

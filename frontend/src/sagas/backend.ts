@@ -19,8 +19,9 @@ import {
   GetDeviceRequestedAction,
   UpdateDeviceRequestedAction,
 } from '../reducers/backend'
-import { backend, Paginator } from '../services/backend'
+import { backend } from '../services/backend'
 import { redirectIfUnauthorized } from './session'
+import { Paginator } from '../services/backend/models'
 
 export const sagas: ForkEffect[] = [
   takeLatest<BackendTypes>('backend/LOAD_EVENTS_REQUEST', onLoadEventsRequest),
@@ -53,7 +54,7 @@ export const sagas: ForkEffect[] = [
   ),
 ]
 
-export function* onLoadEventsRequest(action: Action) {
+export function* onLoadEventsRequest(action: Action): Generator {
   try {
     const castedAction: LoadEventsRequestAction =
       action as LoadEventsRequestAction
@@ -69,7 +70,7 @@ export function* onLoadEventsRequest(action: Action) {
   }
 }
 
-function* onLoadEventRequest(action: Action) {
+function* onLoadEventRequest(action: Action): Generator {
   try {
     const castedAction: LoadEventRequestAction =
       action as LoadEventRequestAction
@@ -100,7 +101,7 @@ function* onLoadEventRequest(action: Action) {
   }
 }
 
-function* onLoadFightRequest(action: Action) {
+function* onLoadFightRequest(action: Action): Generator {
   try {
     const castedAction: LoadFightRequestAction =
       action as LoadFightRequestAction
@@ -113,7 +114,7 @@ function* onLoadFightRequest(action: Action) {
   }
 }
 
-function* onLoadFighterRequest(action: Action) {
+function* onLoadFighterRequest(action: Action): Generator {
   try {
     const castedAction: LoadFighterRequestAction =
       action as LoadFighterRequestAction
@@ -161,7 +162,7 @@ function* onLoadFighterRequest(action: Action) {
   }
 }
 
-function* onLoadFightersRequest(action: Action) {
+function* onLoadFightersRequest(action: Action): Generator {
   try {
     const castedAction: LoadFightersRequestAction =
       action as LoadFightersRequestAction
@@ -177,7 +178,7 @@ function* onLoadFightersRequest(action: Action) {
   }
 }
 
-function* onSearchFightersRequest(action: Action) {
+function* onSearchFightersRequest(action: Action): Generator {
   try {
     const castedAction: SearchFightersRequestAction =
       action as SearchFightersRequestAction
@@ -194,7 +195,7 @@ function* onSearchFightersRequest(action: Action) {
   }
 }
 
-export function* onGetDevicesRequest() {
+export function* onGetDevicesRequest(): Generator {
   try {
     const devices: Device[] = yield call(backend.getDevices)
     yield put(backendActions.getDevicesSuccess(devices))
@@ -204,7 +205,7 @@ export function* onGetDevicesRequest() {
   }
 }
 
-export function* onDeleteDeviceRequest(action: Action) {
+export function* onDeleteDeviceRequest(action: Action): Generator {
   try {
     const castedAction: DeleteDeviceRequestedAction =
       action as DeleteDeviceRequestedAction
@@ -220,7 +221,7 @@ export function* onDeleteDeviceRequest(action: Action) {
   }
 }
 
-export function* onGetDeviceRequest(action: Action) {
+export function* onGetDeviceRequest(action: Action): Generator {
   try {
     const castedAction: GetDeviceRequestedAction =
       action as GetDeviceRequestedAction
@@ -233,7 +234,7 @@ export function* onGetDeviceRequest(action: Action) {
   }
 }
 
-export function* onUpdateDeviceRequest(action: Action) {
+export function* onUpdateDeviceRequest(action: Action): Generator {
   try {
     const castedAction: UpdateDeviceRequestedAction =
       action as UpdateDeviceRequestedAction

@@ -6,8 +6,9 @@ import {
   LoadEventsRequestAction,
 } from '../../src/reducers/backend'
 import { call, put } from 'redux-saga/effects'
-import { backend, Paginator } from '../../src/services/backend'
+import { backend } from '../../src/services/backend'
 import { redirectIfUnauthorized } from '../../src/sagas/session'
+import { Paginator } from '../../src/services/backend/models'
 
 describe('backend sagas', () => {
   it('check that onLoadEventsRequest executes successfully', () => {

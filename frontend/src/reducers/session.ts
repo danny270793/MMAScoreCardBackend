@@ -56,7 +56,7 @@ export interface LogoutErrorAction extends Action {
 export interface SessionState {
   isLoading: boolean
   token: string | null
-  error: Error | null  
+  error: Error | null
 }
 
 export const initialState: SessionState = {
@@ -65,10 +65,7 @@ export const initialState: SessionState = {
   error: null,
 }
 
-type Reducer = (
-  state: SessionState,
-  action: UnknownAction,
-) => SessionState
+type Reducer = (state: SessionState, action: UnknownAction) => SessionState
 
 export const reducer: Reducer = (
   state = initialState,
@@ -78,7 +75,7 @@ export const reducer: Reducer = (
     case 'session/INIT':
       return initialState
     case 'session/CLEAR_ERROR':
-    return { ...state, error: null }
+      return { ...state, error: null }
     case 'session/LOGIN_REQUESTED':
       return {
         ...state,
@@ -116,7 +113,7 @@ export const reducer: Reducer = (
         isLoading: false,
         token: null,
       }
-    
+
     default:
       return state
   }
@@ -124,7 +121,7 @@ export const reducer: Reducer = (
 
 export const actions = {
   init: (): InitAction => ({
-    type: 'session/INIT'
+    type: 'session/INIT',
   }),
   clearError: (): ClearErrorAction => ({
     type: 'session/CLEAR_ERROR',
@@ -134,11 +131,11 @@ export const actions = {
   login: (username: string, password: string): LoginRequestedAction => ({
     type: 'session/LOGIN_REQUESTED',
     username,
-    password
+    password,
   }),
   loginSuccess: (token: string): LoginSuccessAction => ({
     type: 'session/LOGIN_SUCCESS',
-    token
+    token,
   }),
   loginError: (error: Error): LoginErrorAction => ({
     type: 'session/LOGIN_ERROR',
@@ -147,7 +144,7 @@ export const actions = {
 
   logout: (token: string): LogoutRequestedAction => ({
     type: 'session/LOGOUT_REQUESTED',
-    token
+    token,
   }),
   logoutSuccess: (): LogoutSuccessAction => ({
     type: 'session/LOGOUT_SUCCESS',
@@ -165,5 +162,5 @@ export interface Store {
 export const selectors = {
   getError: ({ session }: Store): Error | null => session.error,
   getToken: ({ session }: Store): string | null => session.token,
-  getIsLoading: ({ session }: Store): boolean => session.isLoading  
+  getIsLoading: ({ session }: Store): boolean => session.isLoading,
 }

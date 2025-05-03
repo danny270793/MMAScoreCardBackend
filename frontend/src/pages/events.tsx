@@ -6,19 +6,21 @@ import {
   actions as backendActions,
   Event,
 } from '../reducers/backend'
-import { Paginator } from '../services/backend'
-import { NavigateFunction, useNavigate } from 'react-router-dom'
 import { EventDescription } from '../components/event-description'
 import { Loader } from '../components/loader'
 import { AppBar } from '../components/appbar'
-import { Modal } from '../components/modal'
 import { List, ListItem } from '../components/list'
 import { Section } from '../components/section'
 import { Button } from '../components/button'
 import { WithLoader } from '../components/with-loader'
+import { NavigateTo, useNavigateTo } from '../hooks/use-navigate-to'
+import { ErrorModal } from '../components/error-modal'
+import { Paginator } from '../services/backend/models'
+import { useTranslation } from 'react-i18next'
 
 export const EventsPage: () => React.ReactElement = () => {
-  const navigate: NavigateFunction = useNavigate()
+  const { t } = useTranslation()
+  const navigateTo: NavigateTo = useNavigateTo()
   const dispatch: Dispatch = useDispatch()
   const [page, setPage] = useState<number>(1)
   const [allEvents, setAllEvents] = useState<Event[]>([])
@@ -56,7 +58,7 @@ export const EventsPage: () => React.ReactElement = () => {
   }
 
   const onSeeMoreClicked: (event: Event) => void = (event: Event) => {
-    navigate(`/events/${event.id}`)
+    navigateTo.event(event.id)
   }
 
   const showLoadMoreButton: boolean =
@@ -64,38 +66,37 @@ export const EventsPage: () => React.ReactElement = () => {
 
   return (
     <>
-      {error && (
-        <Modal
-          title="Error"
-          onClose={() => dispatch(backendActions.clearError())}
-        >
-          <p>{error.message}</p>
-          <pre style={{ overflow: 'auto' }}>{error.stack}</pre>
-        </Modal>
-      )}
-      <AppBar title="Events" />
+      <ErrorModal
+        error={error}
+        onClose={() => dispatch(backendActions.clearError())}
+      />
+      <AppBar title={t('events', { postProcess: 'capitalize' })} />
       <WithLoader isLoading={!isLoadingMore && isLoading}>
-        <>
-          <Section>
-            <List>
-              {allEvents.length === 0 && <ListItem>No events found</ListItem>}
-              {allEvents.length > 0 &&
-                allEvents.map((event: Event) => (
-                  <ListItem key={event.id}>
-                    <EventDescription
-                      event={event}
-                      showEventName={true}
-                      onSeeMoreClicked={onSeeMoreClicked}
-                    />
-                  </ListItem>
-                ))}
-            </List>
-          </Section>
-          {isLoadingMore && <Loader size="small" />}
-          {!isLoadingMore && showLoadMoreButton && (
-            <Button onClick={onLoadMoreClicked}>Load more</Button>
-          )}
-        </>
+        <Section>
+          <List>
+            {allEvents.length === 0 && (
+              <ListItem>
+                {t('eventsNotFound', { postProcess: 'capitalize' })}
+              </ListItem>
+            )}
+            {allEvents.length > 0 &&
+              allEvents.map((event: Event) => (
+                <ListItem key={event.id}>
+                  <EventDescription
+                    event={event}
+                    showEventName={true}
+                    onSeeMoreClicked={onSeeMoreClicked}
+                  />
+                </ListItem>
+              ))}
+          </List>
+        </Section>
+        {isLoadingMore && <Loader size="small" />}
+        {!isLoadingMore && showLoadMoreButton && (
+          <Button onClick={onLoadMoreClicked}>
+            {t('loadMore', { postProcess: 'capitalize' })}
+          </Button>
+        )}
       </WithLoader>
     </>
   )
