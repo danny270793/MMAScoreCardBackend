@@ -5,6 +5,7 @@ import React, {
   useContext,
   Context,
 } from 'react'
+import { StatusBar } from '../utils/statusbar'
 
 export type Theme = 'light' | 'dark' | 'system'
 
@@ -50,17 +51,15 @@ export const ThemeContextProvider: React.FC<ThemeContextProviderProps> = ({
     setCurrentTheme(theme)
     localStorage.setItem('theme', theme)
 
-    if (window.StatusBar) {
-      if (theme === 'dark') {
-        window.StatusBar.backgroundColorByHexString('#2b2a2a')
-      } else if (theme === 'light') {
-        window.StatusBar.backgroundColorByHexString('#2196f3')
-      } else if (theme === 'system') {
-        if (systemThemeIsDark) {
-          window.StatusBar.backgroundColorByHexString('#2b2a2a')
-        } else {
-          window.StatusBar.backgroundColorByHexString('#2196f3')
-        }
+    if (theme === 'dark') {
+      StatusBar.backgroundColorByHexString('#2b2a2a')
+    } else if (theme === 'light') {
+      StatusBar.backgroundColorByHexString('#2196f3')
+    } else if (theme === 'system') {
+      if (systemThemeIsDark) {
+        StatusBar.backgroundColorByHexString('#2b2a2a')
+      } else {
+        StatusBar.backgroundColorByHexString('#2196f3')
       }
     }
 
