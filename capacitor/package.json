@@ -3,8 +3,13 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "android:run": "cap run android",
-    "android:add": "cap add android"
+    "android:start": "cap run android",
+    "android:open": "cap open android",
+    "android:add": "cap add android",
+
+    "ios:start": "cap run ios",
+    "ios:open": "cap open ios",
+    "ios:add": "cap add ios"
   },
   "keywords": [],
   "author": "",
