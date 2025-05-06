@@ -6,17 +6,25 @@
   "scripts": {
     "web:build": "cd frontend && npm run build",
 
-    "android:build": "cd mobile && npm run build:android",
-    "android:start": "cd mobile && npm run start:android",
-    "android": "npm run web:build -- -- --mode=embeded --minify=false && npm run android:build && npm run android:start",
-    
-    "ios:build": "cd mobile && npm run build:ios",
-    "ios:start": "cd mobile && npm run start:ios",
-    "ios": "npm run web:build -- -- --mode=embeded --minify=false && npm run ios:build && npm run ios:start",
+    "cordova:android:build": "cd cordova && npm run build:android", 
+    "cordova:android:start": "cd cordova && npm run start:android",
+    "cordova:android": "npm run web:build -- -- --mode=embeded --minify=false && npm run cordova:android:build && npm run cordova:android:start",
 
-    "desktop:build": "cd mobile && npm run build:desktop",
-    "desktop:start": "cd mobile && npm run start:desktop",
-    "desktop": "npm run web:build -- -- --mode=embeded --minify=false && npm run desktop:build && npm run desktop:start"
+    "capacitor:android:build": "cp -r ./frontend/dist/* ./capacitor/www", 
+    "capacitor:android:start": "cd capacitor && npm run android:start",
+    "capacitor:android": "npm run web:build -- -- --mode=embeded --minify=false && npm run capacitor:android:build && npm run capacitor:android:start",
+    
+    "cordova:ios:build": "cd cordova && npm run build:ios",
+    "cordova:ios:start": "cd cordova && npm run start:ios",
+    "cordova:ios": "npm run web:build -- -- --mode=embeded --minify=false && npm run cordova:ios:build && npm run cordova:ios:start",
+
+    "capacitor:ios:build": "cp -r ./frontend/dist/* ./capacitor/www", 
+    "capacitor:ios:start": "cd capacitor && npm run ios:start",
+    "capacitor:ios": "npm run web:build -- -- --mode=embeded --minify=false && npm run capacitor:ios:build && npm run capacitor:ios:start",
+
+    "cordova:desktop:build": "cd cordova && npm run build:desktop",
+    "cordova:desktop:start": "cd cordova && npm run start:desktop",
+    "cordova:desktop": "npm run web:build -- -- --mode=embeded --minify=false && npm run cordova:desktop:build && npm run cordova:desktop:start"
   },
   "keywords": [],
   "author": "",
