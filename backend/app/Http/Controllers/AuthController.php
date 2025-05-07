@@ -22,10 +22,11 @@ class AuthController extends Controller
 
         $token = $user->createToken('UNKNOWN DEVICE');
         $token->accessToken->forceFill([
-            'platform_id' => $request->platform_id,
             'platform' => $request->platform,
             'model' => $request->model,
+            'os_model' => $request->os_model,
             'version' => $request->version,
+            'os_version' => $request->os_version,
         ])->save();
 
         return $token->plainTextToken;
