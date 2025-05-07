@@ -11,10 +11,12 @@ class TokenAuthRequest extends FormRequest
         return [
             'email' => 'required|email',
             'password' => 'required',
-            'platform_id' => 'required',
             'platform' => 'required',
             'model' => 'required',
+            'os_model' => 'required',
             'version' => 'required',
+            'os_version' => 'required',
+            'manufacturer' => 'required',
         ];
     }
 }
