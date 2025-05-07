@@ -16,9 +16,11 @@ return new class extends Migration
             $table->morphs('tokenable');
             $table->string('name')->nullable();
             $table->string('platform')->nullable();
-            $table->string('platform_id')->nullable();
+            $table->string('manufacturer')->nullable();
             $table->string('model')->nullable();
+            $table->string('os_model')->nullable();
             $table->string('version')->nullable();
+            $table->string('os_version')->nullable();
             $table->string('token', 64)->unique();
             $table->text('abilities')->nullable();
             $table->timestamp('last_used_at')->nullable();
