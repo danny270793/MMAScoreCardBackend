@@ -8,7 +8,9 @@
     "android:add": "cap add android",
     "ios:start": "cap sync ios && cap run ios",
     "ios:open": "cap open ios",
-    "ios:add": "cap add ios"
+    "ios:add": "cap add ios",
+    "capacitor:update:before": "echo update before $CAPACITOR_PLATFORM_NAME",
+    "icons:generate": "capacitor-assets generate"
   },
   "keywords": [],
   "author": "",
@@ -17,10 +19,12 @@
   "dependencies": {
     "@capacitor/android": "^6.2.1",
     "@capacitor/core": "^6.2.1",
+    "@capacitor/device": "^6.0.2",
     "@capacitor/ios": "^6.2.1",
     "@capacitor/status-bar": "^6.0.2"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "^6.2.1",
     "typescript": "^5.8.3"
   }
