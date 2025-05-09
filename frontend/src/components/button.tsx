@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { MouseEventHandler } from 'react'
 
 export interface ButtonProps {
   children: React.ReactNode
   className?: string
   type?: 'error' | 'info' | 'warning' | 'success'
-  onClick?: () => void
+  onClick?: MouseEventHandler
 }
 
 export const Button = ({
