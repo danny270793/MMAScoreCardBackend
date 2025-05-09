@@ -6,9 +6,9 @@ const logger = new Logger('/src/utils/statusbar.ts')
 
 export const StatusBar = {
     backgroundColorByHexString: (color: string) => {
-        const isNativePlatform: boolean = Capacitor.isNativePlatform()
-        logger.debug(`isNativePlatform: ${isNativePlatform}`)
-        if(isNativePlatform) {
+        const platform: string = Capacitor.getPlatform()
+        logger.debug(`platform: ${platform}`)
+        if(platform === 'android') {
             CapacitorStatusBar.setBackgroundColor({ color})
         }
         // if(window.StatusBar) {
