@@ -88,7 +88,9 @@ export const LoginPage: () => React.ReactElement = () => {
           <br />
           {isLoading && <Loader size="xsmall" />}
           {!isLoading && (
-            <Button>{t('login', { postProcess: 'upper' })}</Button>
+            <Button className="w3-block w3-blue">
+              {t('login', { postProcess: 'upper' })}
+            </Button>
           )}
         </Card>
       </form>
