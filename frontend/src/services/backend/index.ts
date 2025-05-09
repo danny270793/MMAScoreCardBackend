@@ -15,18 +15,22 @@ export const backend = {
   login: async (
     email: string,
     password: string,
+    manufacturer: string,
     model: string,
-    platformId: string,
+    osModel: string,
     platform: string,
     version: string,
+    osVersion: string,
   ): Promise<string> => {
     const body: { [key: string]: string } = {
       email,
       password,
+      manufacturer,
       model,
-      platform_id: platformId,
+      os_model: osModel,
       platform,
       version,
+      os_version: osVersion
     }
 
     const response: Response = await http.postAnonymous(

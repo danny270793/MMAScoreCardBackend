@@ -13,6 +13,7 @@ import { NavigateTo, useNavigateTo } from '../hooks/use-navigate-to'
 import { ApiValidationError } from '../services/http/errors'
 import { useTranslation } from 'react-i18next'
 import { Input } from '../components/input'
+import { ErrorModal } from '../components/error-modal'
 
 export const LoginPage: () => React.ReactElement = () => {
   const { t } = useTranslation()
@@ -50,6 +51,10 @@ export const LoginPage: () => React.ReactElement = () => {
   return (
     <>
       <AppBar title={t('login', { postProcess: 'capitalize' })} />
+      <ErrorModal
+        error={error}
+        onClose={() => dispatch(sessionActions.clearError())}
+      />
       <form className="w3-container" onSubmit={onSubmit}>
         <Card>
           <Input
@@ -83,7 +88,9 @@ export const LoginPage: () => React.ReactElement = () => {
           <br />
           {isLoading && <Loader size="xsmall" />}
           {!isLoading && (
-            <Button>{t('login', { postProcess: 'upper' })}</Button>
+            <Button className="w3-block w3-blue">
+              {t('login', { postProcess: 'upper' })}
+            </Button>
           )}
         </Card>
       </form>

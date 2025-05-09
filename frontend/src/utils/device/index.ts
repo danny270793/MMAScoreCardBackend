@@ -1,65 +1,48 @@
+import { Capacitor } from '@capacitor/core';
+import { Device, DeviceInfo as CapacitorDeviceInfo } from '@capacitor/device';
 import { iphones } from './iphones'
 import { macs } from './macs'
 
 export const isiOS = (): boolean => {
-  return (window.cordova && window.cordova.platformId === 'ios') || false
+  return Capacitor.getPlatform() == 'ios'
 }
 
 export const isAndroid = (): boolean => {
-  return (window.cordova && window.cordova.platformId === 'android') || false
+  return Capacitor.getPlatform() == 'android'
 }
 
 export const isElectron = (): boolean => {
-  return (window.cordova && window.cordova.platformId === 'electron') || false
+  return false
 }
 
 export const isWeb = (): boolean => {
-  return window.cordova ? false : true
+  return Capacitor.getPlatform() == 'web'
 }
 
 export interface DeviceInfo {
-  platformId: string
   platform: string
   model: string
+  osModel: string
   version: string
+  osVersion: string
+  manufacturer: string
 }
 
-export function getDeviceInfo(): DeviceInfo {
+export async function getDeviceInfo(): Promise<DeviceInfo> {
+  const info: CapacitorDeviceInfo  = await Device.getInfo()
+
   return {
-    platformId: getPlatformId(),
-    platform: getPlatform(),
-    model: getModel(),
-    version: getVersion(),
+    platform: info.platform,
+    model: info.platform === 'web' ? getBrowserInfo(true) : info.model,
+    osModel: info.model,
+    version: info.platform === 'web' ? info.webViewVersion : info.osVersion,
+    osVersion: info.osVersion,
+    manufacturer: info.manufacturer
   }
-}
-
-export function getPlatformId(): string {
-  return (
-    (window.cordova && window.cordova.platformId) ||
-    getBrowserInfo(true).toLowerCase()
-  )
-}
-
-export function getPlatform() {
-  return isElectron()
-    ? 'Electron'
-    : (window.device && window.device.platform) || 'Browser'
-}
-
-export function getModel() {
-  return (window.device && window.device.model) || getBrowserInfo(true)
 }
 
 export function getModelReadable(model: string) {
   return iphones[model] || macs[model] || model
-}
-
-export function getVersion() {
-  return (window.device && window.device.version) || getBrowserInfo(false)
-}
-
-export function getManufacturer() {
-  return (window.device && window.device.manufacturer) || navigator.platform
 }
 
 function getBrowserInfo(getModel: boolean): string {

@@ -28,16 +28,18 @@ export function* onLoginRequested(action: Action) {
   try {
     const castedAction: LoginRequestedAction = action as LoginRequestedAction
 
-    const device: DeviceInfo = getDeviceInfo()
+    const device: DeviceInfo = yield call(getDeviceInfo)
 
     const token: string = yield call(
       backend.login,
       castedAction.username,
       castedAction.password,
+      device.manufacturer,
       device.model,
-      device.platformId,
+      device.osModel,
       device.platform,
       device.version,
+      device.osVersion,
     )
     yield put(sessionActions.loginSuccess(token))
   } catch (error) {

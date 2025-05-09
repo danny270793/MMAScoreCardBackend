@@ -13,6 +13,7 @@
     "capacitor:android:build": "cp -r ./frontend/dist/* ./capacitor/www", 
     "capacitor:android:start": "cd capacitor && npm run android:start",
     "capacitor:android": "npm run web:build -- -- --mode=embeded --minify=false && npm run capacitor:android:build && npm run capacitor:android:start",
+    "android": "npm run capacitor:android",
     
     "cordova:ios:build": "cd cordova && npm run build:ios",
     "cordova:ios:start": "cd cordova && npm run start:ios",
@@ -21,6 +22,7 @@
     "capacitor:ios:build": "cp -r ./frontend/dist/* ./capacitor/www", 
     "capacitor:ios:start": "cd capacitor && npm run ios:start",
     "capacitor:ios": "npm run web:build -- -- --mode=embeded --minify=false && npm run capacitor:ios:build && npm run capacitor:ios:start",
+    "ios": "npm run capacitor:ios",
 
     "cordova:desktop:build": "cd cordova && npm run build:desktop",
     "cordova:desktop:start": "cd cordova && npm run start:desktop",
