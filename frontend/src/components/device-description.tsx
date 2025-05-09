@@ -35,16 +35,12 @@ export const DeviceDescription = ({
     }
   }, [newName])
 
-  const isKnownPlatform = (device: Device): boolean => {
-    const icon: string | null = PlatformIcon[device.platform_id]
-    if (icon) {
-      return false
-    }
-    return true
-  }
-
   const getIcon = (device: Device): React.ReactElement => {
-    const icon: string = PlatformIcon[device.platform_id] || unknown
+    const platformId: string = (
+      device.platform === 'web' ? device.model : device.platform
+    ).toLowerCase()
+
+    const icon: string = PlatformIcon[platformId] || unknown
     return <img width="100%" src={icon} className="w3-padding" />
   }
 
@@ -73,11 +69,22 @@ export const DeviceDescription = ({
               />
             </>
           )}
-          {isKnownPlatform(device) && <div>Platform: {device.platform}</div>}
-          <div>Model: {getModelReadable(device.model)}</div>
-          <div>Version: {device.version}</div>
+          {device.platform === 'web' && (
+            <div>Device model: {device.os_model}</div>
+          )}
+          {device.platform === 'web' && (
+            <div>Device version: {device.os_version}</div>
+          )}
           <div>
-            Last used at:{' '}
+            {device.platform === 'web' ? 'Browser model' : 'Model'}:{' '}
+            {getModelReadable(device.model)}
+          </div>
+          <div>
+            {device.platform === 'web' ? 'Browser version' : 'Version'}:{' '}
+            {device.version}
+          </div>
+          <div>
+            Last used:{' '}
             {device.last_used_at
               ? device.last_used_at
                   .toISOString()
