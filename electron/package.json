@@ -5,8 +5,7 @@
   "scripts": {
     "build": "tsc",
     "start": "electron .",
-    "build:start": "tsc && electron .",
-    "dev": "ts-node src/main.ts"
+    "build:start": "tsc && electron ."
   },
   "keywords": [],
   "author": "",
