@@ -1,6 +1,5 @@
 // import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { HashRouter } from 'react-router-dom'
 import { BrowserRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { persistedStore, store } from './reducers'
@@ -18,9 +17,6 @@ function startupReact() {
   const rootElement: HTMLElement | null = document.getElementById('root')
 
   const Router: React.FC<{ children: React.ReactNode }> = (props) => {
-    if (window.cordova) {
-      return <HashRouter>{props.children}</HashRouter>
-    }
     return <BrowserRouter>{props.children}</BrowserRouter>
   }
 
@@ -44,8 +40,4 @@ function startupReact() {
   )
 }
 
-if (window.cordova) {
-  document.addEventListener('deviceready', startupReact, false)
-} else {
-  startupReact()
-}
+startupReact()

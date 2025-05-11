@@ -11,8 +11,12 @@ export const isAndroid = (): boolean => {
   return Capacitor.getPlatform() == 'android'
 }
 
+export const isMobile = (): boolean => {
+  return isiOS() || isAndroid()
+}
+
 export const isElectron = (): boolean => {
-  return false
+  return window.electron ? true : false
 }
 
 export const isWeb = (): boolean => {
@@ -32,12 +36,36 @@ export async function getDeviceInfo(): Promise<DeviceInfo> {
   const info: CapacitorDeviceInfo  = await Device.getInfo()
 
   return {
-    platform: info.platform,
-    model: info.platform === 'web' ? getBrowserInfo(true) : info.model,
+    platform: getPlatform(info),
+    model: getModel(info),
     osModel: info.model,
-    version: info.platform === 'web' ? info.webViewVersion : info.osVersion,
+    version: getVersion(info),
     osVersion: info.osVersion,
     manufacturer: info.manufacturer
+  }
+}
+
+function getPlatform(info: CapacitorDeviceInfo): string {
+  if(isElectron()) {
+    return 'electron'
+  } else {
+   return info.platform; 
+  }
+}
+
+function getModel(info: CapacitorDeviceInfo): string {
+  if(isElectron()) {
+    return info.model
+  } else {
+    return info.platform === 'web' ? getBrowserInfo(true) : info.model
+  }
+}
+
+function getVersion(info: CapacitorDeviceInfo): string {
+  if(isElectron()) {
+    return info.osVersion
+  } else {
+    return info.platform === 'web' ? info.webViewVersion : info.osVersion
   }
 }
 

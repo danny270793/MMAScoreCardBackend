@@ -31,8 +31,6 @@ export const Routes: () => React.ReactElement = () => {
     <RouterRoutes>
       <Route path="/" element={<AuthenticatedRoutes />}>
         <Route path={RoutesName.home} element={<HomePage />} />
-        {window.cordova && <Route path="/index.html" element={<HomePage />} />}
-
         <Route path={RoutesName.devices} element={<DevicesPage />} />
         <Route path={RoutesName.device} element={<DevicePage />} />
         <Route path={RoutesName.events} element={<EventsPage />} />
