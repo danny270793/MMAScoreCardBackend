@@ -1,6 +1,6 @@
 // import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter, HashRouter } from 'react-router-dom'
 import { Provider } from 'react-redux'
 import { persistedStore, store } from './reducers'
 import './styles/index.css'
@@ -17,6 +17,9 @@ function startupReact() {
   const rootElement: HTMLElement | null = document.getElementById('root')
 
   const Router: React.FC<{ children: React.ReactNode }> = (props) => {
+    if (window.electron) {
+      return <HashRouter>{props.children}</HashRouter>
+    }
     return <BrowserRouter>{props.children}</BrowserRouter>
   }
 
