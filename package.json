@@ -26,7 +26,12 @@
 
     "cordova:desktop:build": "cd cordova && npm run build:desktop",
     "cordova:desktop:start": "cd cordova && npm run start:desktop",
-    "cordova:desktop": "npm run web:build -- -- --mode=embeded --minify=false && npm run cordova:desktop:build && npm run cordova:desktop:start"
+    "cordova:desktop": "npm run web:build -- -- --mode=embeded --minify=false && npm run cordova:desktop:build && npm run cordova:desktop:start",
+
+    "electron:desktop:build": "cp -r ./frontend/dist/* ./electron/www && cd electron && npm run build",
+    "electron:desktop:start": "cd electron && npm run start",
+    "electron:desktop": "npm run web:build -- -- --mode=embeded --minify=false && npm run electron:desktop:build && npm run electron:desktop:start",
+    "desktop": "npm run electron:desktop"
   },
   "keywords": [],
   "author": "",
