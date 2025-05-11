@@ -27,7 +27,6 @@ export const i18n = i18Next
       },
     },
     fallbackLng: 'en',
-    debug: true,
     interpolation: {
       escapeValue: false,
     },

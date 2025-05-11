@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow } from 'electron'
 import * as Path from 'path'
 
 const isDebug: boolean = process.env.NODE_ENV === 'development'

@@ -5,17 +5,19 @@
   "scripts": {
     "build": "tsc",
     "start": "electron .",
-    "build:start": "tsc && electron ."
+    "build:start": "tsc && electron .",
+    "package": "npx @electron/packager . UFCEvents --arch=arm64,x64 --platform=darwin --out=build/ --overwrite --icon=www/icon",
+    "open": "open ./build/UFCEvents-darwin-arm64/UFCEvents.app"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@electron/packager": "^18.3.6",
     "@types/electron": "^1.4.38",
     "@types/node": "^22.15.17",
     "electron": "^36.2.0",
-    "electron-packager": "^17.1.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   }
